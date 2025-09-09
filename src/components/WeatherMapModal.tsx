@@ -23,13 +23,15 @@ import {
   Zap
 } from 'lucide-react';
 import { fetchWeatherApi } from 'openmeteo';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface WeatherMapModalProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
   currentLocation?: { lat: number; lng: number; address: string };
 }
 
-const GOOGLE_API_KEY = 'AIzaSyBmlIUNvfTAacQ3K_wb7RDMwKF8Fo2XiaE';
+const MAPBOX_API_KEY = 'pk.eyJ1IjoiaGFyaXNod2FyYW4iLCJhIjoiY21hZHhwZGs2MDF4YzJxczh2aDd0cWg1MyJ9.qcu0lpqVlZlC2WFxhwb1Pg';
 
 // Weather overlay types
 interface WeatherOverlay {
@@ -45,8 +47,9 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
   currentLocation 
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
+  const [marker, setMarker] = useState<mapboxgl.Marker | null>(null);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [weatherLayers, setWeatherLayers] = useState<WeatherOverlay[]>([
@@ -59,105 +62,68 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
   const [currentWeatherData, setCurrentWeatherData] = useState<any>(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
 
-  // Initialize Google Maps with weather layers
+  // Initialize Mapbox with weather layers
   useEffect(() => {
     const initMap = async () => {
       try {
-        const { Loader } = await import('@googlemaps/js-api-loader');
-        const loader = new Loader({
-          apiKey: GOOGLE_API_KEY,
-          version: 'weekly',
-          libraries: ['places', 'geometry', 'visualization']
-        });
-
-        await loader.load();
-
         if (!mapRef.current) return;
 
-        const googleMap = new google.maps.Map(mapRef.current, {
-          center: currentLocation 
-            ? { lat: currentLocation.lat, lng: currentLocation.lng }
-            : { lat: 28.7041, lng: 77.1025 },
+        // Mapbox access token
+        mapboxgl.accessToken = MAPBOX_API_KEY;
+
+        const styleUrl = mapType === 'satellite'
+          ? 'mapbox://styles/mapbox/satellite-v9'
+          : mapType === 'hybrid'
+          ? 'mapbox://styles/mapbox/satellite-streets-v12'
+          : 'mapbox://styles/mapbox/streets-v12';
+
+        const mapboxMap = new mapboxgl.Map({
+          container: mapRef.current,
+          style: styleUrl,
+          center: currentLocation
+            ? [currentLocation.lng, currentLocation.lat]
+            : [77.1025, 28.7041], // [lng, lat] Delhi
           zoom: 8,
-          mapTypeId: google.maps.MapTypeId[mapType.toUpperCase() as keyof typeof google.maps.MapTypeId],
-          styles: mapType === 'roadmap' ? [
-            {
-              featureType: 'all',
-              elementType: 'labels.text.fill',
-              stylers: [{ color: '#ffffff' }]
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.stroke',
-              stylers: [{ color: '#000000' }, { lightness: 13 }]
-            }
-          ] : [],
-          mapTypeControl: true,
-          mapTypeControlOptions: {
-            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-            position: google.maps.ControlPosition.TOP_CENTER,
-          },
-          zoomControl: true,
-          zoomControlOptions: {
-            position: google.maps.ControlPosition.RIGHT_CENTER,
-          },
-          scaleControl: true,
-          streetViewControl: false,
-          fullscreenControl: true,
         });
 
-        // Create weather marker with enhanced info
-        const mapMarker = new google.maps.Marker({
-          position: currentLocation 
-            ? { lat: currentLocation.lat, lng: currentLocation.lng }
-            : { lat: 28.7041, lng: 77.1025 },
-          map: googleMap,
-          draggable: true,
-          title: 'Weather Location',
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 12,
-            fillColor: '#3b82f6',
-            fillOpacity: 0.8,
-            strokeColor: '#ffffff',
-            strokeWeight: 3,
-          }
-        });
+        mapboxMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        mapboxMap.addControl(new mapboxgl.ScaleControl({ unit: 'metric' }));
 
-        // Add weather info window
-        const infoWindow = new google.maps.InfoWindow();
+        const mapboxMarker = new mapboxgl.Marker({ draggable: true })
+          .setLngLat(
+            currentLocation
+              ? [currentLocation.lng, currentLocation.lat]
+              : [77.1025, 28.7041]
+          )
+          .addTo(mapboxMap);
+
+        // Prepare popup
+        popupRef.current = new mapboxgl.Popup({ closeOnClick: false, closeButton: true });
 
         // Handle map clicks
-        googleMap.addListener('click', async (event: google.maps.MapMouseEvent) => {
-          if (event.latLng) {
-            const lat = event.latLng.lat();
-            const lng = event.latLng.lng();
-            
-            mapMarker.setPosition({ lat, lng });
-            await updateLocationWeather(lat, lng, mapMarker, infoWindow);
-          }
+        mapboxMap.on('click', async (event) => {
+          const { lng, lat } = event.lngLat;
+          mapboxMarker.setLngLat([lng, lat]);
+          await updateLocationWeather(lat, lng, mapboxMarker);
         });
 
         // Handle marker drag
-        mapMarker.addListener('dragend', async () => {
-          const position = mapMarker.getPosition();
-          if (position) {
-            const lat = position.lat();
-            const lng = position.lng();
-            await updateLocationWeather(lat, lng, mapMarker, infoWindow);
+        mapboxMarker.on('dragend', async () => {
+          const { lng, lat } = mapboxMarker.getLngLat();
+          await updateLocationWeather(lat, lng, mapboxMarker);
+        });
+
+        mapboxMap.on('load', async () => {
+          setIsLoading(false);
+          if (currentLocation) {
+            await updateLocationWeather(currentLocation.lat, currentLocation.lng, mapboxMarker);
           }
         });
 
-        // Load initial weather data
-        if (currentLocation) {
-          await updateLocationWeather(currentLocation.lat, currentLocation.lng, mapMarker, infoWindow);
-        }
-
-        setMap(googleMap);
-        setMarker(mapMarker);
-        setIsLoading(false);
+        setMap(mapboxMap);
+        setMarker(mapboxMarker);
       } catch (error) {
-        console.error('Error loading Google Maps:', error);
+        console.error('Error loading Mapbox:', error);
         setIsLoading(false);
       }
     };
@@ -167,22 +133,22 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
 
   // Update weather data for location
   const updateLocationWeather = async (
-    lat: number, 
-    lng: number, 
-    mapMarker: google.maps.Marker,
-    infoWindow: google.maps.InfoWindow
+    lat: number,
+    lng: number,
+    mapMarker: mapboxgl.Marker
   ) => {
     setLoadingWeather(true);
     try {
-      // Get address from coordinates
-      const geocoder = new google.maps.Geocoder();
-      let address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      
+      // Get address from coordinates via Mapbox with high precision
+      let address = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
       try {
-        const response = await geocoder.geocode({ location: { lat, lng } });
-        address = response.results[0]?.formatted_address || address;
+        const resp = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_API_KEY}&types=address,poi,place,locality&limit=1`
+        );
+        const data = await resp.json();
+        address = data.features?.[0]?.place_name || address;
       } catch (error) {
-        console.error('Geocoding error:', error);
+        console.error('Reverse geocoding error:', error);
       }
 
       // Get weather data from OpenMeteo
@@ -208,10 +174,9 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
 
       setCurrentWeatherData(weatherData);
 
-      // Update info window
+      // Update popup
       const weatherIcon = getWeatherIcon(weatherData.weatherCode);
       const weatherCondition = getWeatherCondition(weatherData.weatherCode);
-      
       const infoContent = `
         <div class="p-4 min-w-[200px]">
           <div class="flex items-center gap-2 mb-2">
@@ -232,10 +197,16 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
         </div>
       `;
 
-      infoWindow.setContent(infoContent);
-      infoWindow.open(map, mapMarker);
+      if (!popupRef.current) {
+        popupRef.current = new mapboxgl.Popup({ closeOnClick: false, closeButton: true });
+      }
 
-      // Call the selection callback
+      popupRef.current
+        .setLngLat([lng, lat])
+        .setHTML(infoContent)
+        .addTo(map!);
+
+      // Notify parent
       onLocationSelect(lat, lng, address);
     } catch (error) {
       console.error('Error fetching weather data:', error);
@@ -248,20 +219,20 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
   const handleSearch = async () => {
     if (!searchValue.trim() || !map) return;
 
-    const geocoder = new google.maps.Geocoder();
     try {
-      const response = await geocoder.geocode({ address: searchValue });
-      if (response.results[0]) {
-        const location = response.results[0].geometry.location;
-        const lat = location.lat();
-        const lng = location.lng();
-        const address = response.results[0].formatted_address;
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchValue)}.json?access_token=${MAPBOX_API_KEY}`
+      );
+      const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        const address = data.features[0].place_name;
 
-        map.setCenter({ lat, lng });
+        map.setCenter([lng, lat]);
         map.setZoom(10);
         if (marker) {
-          marker.setPosition({ lat, lng });
-          await updateLocationWeather(lat, lng, marker, new google.maps.InfoWindow());
+          marker.setLngLat([lng, lat]);
+          await updateLocationWeather(lat, lng, marker);
         }
       }
     } catch (error) {
@@ -278,10 +249,10 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
           const lng = position.coords.longitude;
 
           if (map && marker) {
-            map.setCenter({ lat, lng });
+            map.setCenter([lng, lat]);
             map.setZoom(10);
-            marker.setPosition({ lat, lng });
-            await updateLocationWeather(lat, lng, marker, new google.maps.InfoWindow());
+            marker.setLngLat([lng, lat]);
+            await updateLocationWeather(lat, lng, marker);
           }
         },
         (error) => {
@@ -317,7 +288,12 @@ export const WeatherMapModal: React.FC<WeatherMapModalProps> = ({
   const changeMapType = (newType: 'roadmap' | 'satellite' | 'hybrid') => {
     setMapType(newType);
     if (map) {
-      map.setMapTypeId(google.maps.MapTypeId[newType.toUpperCase() as keyof typeof google.maps.MapTypeId]);
+      const styleUrl = newType === 'satellite'
+        ? 'mapbox://styles/mapbox/satellite-v9'
+        : newType === 'hybrid'
+        ? 'mapbox://styles/mapbox/satellite-streets-v12'
+        : 'mapbox://styles/mapbox/streets-v12';
+      map.setStyle(styleUrl);
     }
   };
 

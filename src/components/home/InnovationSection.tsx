@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 import { 
   Plane, 
   Cpu, 
@@ -9,56 +10,78 @@ import {
   Droplets,
   BarChart3
 } from "lucide-react";
+import droneSprayingImage from "@/assets/drone-spraying.jpg";
+import soilSensorsImage from "@/assets/soil-sensors.jpg";
+import aiDetectionImage from "@/assets/ai-detection.jpg";
+import satelliteViewImage from "@/assets/satellite-view.jpg";
+import smartIrrigationImage from "@/assets/smart-irrigation.jpg";
+import marketAnalyticsImage from "@/assets/market-analytics.jpg";
 
 export function InnovationSection() {
+  const navigate = useNavigate();
+
+  const handleNavigation = (link: string) => {
+    if (link.startsWith('http')) {
+      window.open(link, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(link);
+    }
+  };
+
   const innovations = [
     {
       icon: Plane,
       title: "Drone Technology",
       description: "Autonomous UAVs for crop monitoring, spraying, and field analysis",
-      image: "/lovable-uploads/drone-spraying.jpg",
+      image: droneSprayingImage,
       badge: "AI-Powered",
-      color: "bg-gradient-primary"
+      color: "bg-gradient-primary",
+      link: "https://www.india.gov.in/spotlight/namo-drone-didi"
     },
     {
       icon: Thermometer,
       title: "IoT Soil Sensors",  
       description: "Smart sensors monitoring soil health, moisture, and nutrient levels",
-      image: "/lovable-uploads/soil-sensors.jpg",
+      image: soilSensorsImage,
       badge: "Real-time",
-      color: "bg-gradient-secondary"
+      color: "bg-gradient-secondary",
+      link: "https://soilhealth.dac.gov.in/home"
     },
     {
       icon: Cpu,
       title: "AI Disease Detection",
       description: "Machine learning algorithms for early crop disease identification",
-      image: "/lovable-uploads/ai-detection.jpg", 
+      image: aiDetectionImage, 
       badge: "95% Accurate",
-      color: "bg-gradient-primary"
+      color: "bg-gradient-primary",
+      link: "/diagnose"
     },
     {
       icon: Satellite,
       title: "Satellite Imaging",
       description: "High-resolution satellite data for large-scale field monitoring",
-      image: "/lovable-uploads/satellite-view.jpg",
+      image: satelliteViewImage,
       badge: "Global Coverage",
-      color: "bg-gradient-secondary"
+      color: "bg-gradient-secondary",
+      link: "/weather"
     },
     {
       icon: Droplets,
       title: "Smart Irrigation",
       description: "Precision water management based on crop needs and weather data",
-      image: "/lovable-uploads/smart-irrigation.jpg",
+      image: smartIrrigationImage,
       badge: "Water Efficient", 
-      color: "bg-gradient-primary"
+      color: "bg-gradient-primary",
+      link: "/recommendations"
     },
     {
       icon: BarChart3,
       title: "Market Analytics",
       description: "Real-time price tracking and demand forecasting for optimal sales",
-      image: "/lovable-uploads/market-analytics.jpg",
+      image: marketAnalyticsImage,
       badge: "Profit Focused",
-      color: "bg-gradient-secondary"
+      color: "bg-gradient-secondary",
+      link: "/market-analysis"
     }
   ];
 
@@ -123,16 +146,23 @@ export function InnovationSection() {
                     </p>
                   </div>
 
-                  {/* Image Placeholder */}
-                  <div className="mt-4 h-32 bg-gradient-card rounded-lg border border-border/20 flex items-center justify-center">
-                    <innovation.icon className="h-8 w-8 text-muted-foreground/50" />
+                  {/* Innovation Image */}
+                  <div className="mt-4 h-32 bg-gradient-card rounded-lg border border-border/20 overflow-hidden">
+                    <img 
+                      src={innovation.image} 
+                      alt={innovation.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
 
                   {/* Action Indicator */}
                   <div className="mt-4 pt-4 border-t border-border/50">
-                    <div className="flex items-center text-sm text-primary font-medium group-hover:translate-x-2 transition-transform">
+                    <button 
+                      onClick={() => handleNavigation(innovation.link)}
+                      className="flex items-center text-sm text-primary font-medium group-hover:translate-x-2 transition-transform cursor-pointer hover:text-primary/80 w-full text-left"
+                    >
                       Learn More →
-                    </div>
+                    </button>
                   </div>
                 </CardContent>
               </Card>

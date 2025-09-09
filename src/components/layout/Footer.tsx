@@ -52,9 +52,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-3 mb-6 group">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Leaf className="h-7 w-7 text-primary-foreground" />
-              </div>
+              <img 
+                src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                alt="AgriSmart Logo" 
+                className="w-12 h-12 object-contain group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="font-bold text-2xl text-primary">AgriSmart</span>
                 <span className="text-sm text-muted-foreground">Smart Farming Solutions</span>

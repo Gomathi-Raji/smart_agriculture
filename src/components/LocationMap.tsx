@@ -3,116 +3,102 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { MapPin, Search, Loader2 } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface LocationMapProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
   currentLocation?: { lat: number; lng: number; address: string };
 }
 
-const GOOGLE_API_KEY = 'AIzaSyBmlIUNvfTAacQ3K_wb7RDMwKF8Fo2XiaE';
+const MAPBOX_API_KEY = 'pk.eyJ1IjoiaGFyaXNod2FyYW4iLCJhIjoiY21hZHhwZGs2MDF4YzJxczh2aDd0cWg1MyJ9.qcu0lpqVlZlC2WFxhwb1Pg';
 
 export const LocationMap: React.FC<LocationMapProps> = ({ 
   onLocationSelect, 
   currentLocation 
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
+  const [marker, setMarker] = useState<mapboxgl.Marker | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
 
-  // Initialize Google Maps
+  // Initialize Mapbox
   useEffect(() => {
     const initMap = async () => {
       try {
-        // Load Google Maps API
-        const { Loader } = await import('@googlemaps/js-api-loader');
-        const loader = new Loader({
-          apiKey: GOOGLE_API_KEY,
-          version: 'weekly',
-          libraries: ['places', 'geometry']
-        });
-
-        await loader.load();
-
         if (!mapRef.current) return;
 
+        // Set Mapbox access token
+        mapboxgl.accessToken = MAPBOX_API_KEY;
+
         // Create map
-        const googleMap = new google.maps.Map(mapRef.current, {
+        const mapboxMap = new mapboxgl.Map({
+          container: mapRef.current,
+          style: 'mapbox://styles/mapbox/satellite-v9',
           center: currentLocation 
-            ? { lat: currentLocation.lat, lng: currentLocation.lng }
-            : { lat: 28.7041, lng: 77.1025 }, // Default to Delhi
-          zoom: 10,
-          mapTypeId: google.maps.MapTypeId.HYBRID,
-          styles: [
-            {
-              featureType: 'all',
-              elementType: 'labels.text.fill',
-              stylers: [{ color: '#ffffff' }]
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.stroke',
-              stylers: [{ color: '#000000' }, { lightness: 13 }]
-            }
-          ]
+            ? [currentLocation.lng, currentLocation.lat]
+            : [77.1025, 28.7041], // Default to Delhi [lng, lat]
+          zoom: 10
         });
+
+        // Add navigation controls
+        mapboxMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         // Create marker
-        const mapMarker = new google.maps.Marker({
-          position: currentLocation 
-            ? { lat: currentLocation.lat, lng: currentLocation.lng }
-            : { lat: 28.7041, lng: 77.1025 },
-          map: googleMap,
-          draggable: true,
-          title: 'Selected Location'
-        });
+        const mapboxMarker = new mapboxgl.Marker({
+          draggable: true
+        })
+          .setLngLat(currentLocation 
+            ? [currentLocation.lng, currentLocation.lat]
+            : [77.1025, 28.7041])
+          .addTo(mapboxMap);
 
         // Add click listener to map
-        googleMap.addListener('click', async (event: google.maps.MapMouseEvent) => {
-          if (event.latLng) {
-            const lat = event.latLng.lat();
-            const lng = event.latLng.lng();
-            
-            mapMarker.setPosition({ lat, lng });
-            
-            // Get address from coordinates
-            const geocoder = new google.maps.Geocoder();
-            try {
-              const response = await geocoder.geocode({ location: { lat, lng } });
-              const address = response.results[0]?.formatted_address || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-              onLocationSelect(lat, lng, address);
-            } catch (error) {
-              onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-            }
+        mapboxMap.on('click', async (event) => {
+          const { lng, lat } = event.lngLat;
+          
+          mapboxMarker.setLngLat([lng, lat]);
+          
+          // Get address from coordinates using reverse geocoding
+          try {
+            const response = await fetch(
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_API_KEY}`
+            );
+            const data = await response.json();
+            const address = data.features[0]?.place_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            onLocationSelect(lat, lng, address);
+          } catch (error) {
+            onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
           }
         });
 
         // Add drag listener to marker
-        mapMarker.addListener('dragend', async () => {
-          const position = mapMarker.getPosition();
-          if (position) {
-            const lat = position.lat();
-            const lng = position.lng();
-            
-            // Get address from coordinates
-            const geocoder = new google.maps.Geocoder();
-            try {
-              const response = await geocoder.geocode({ location: { lat, lng } });
-              const address = response.results[0]?.formatted_address || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-              onLocationSelect(lat, lng, address);
-            } catch (error) {
-              onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-            }
+        mapboxMarker.on('dragend', async () => {
+          const lngLat = mapboxMarker.getLngLat();
+          const { lng, lat } = lngLat;
+          
+          // Get address from coordinates
+          try {
+            const response = await fetch(
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_API_KEY}`
+            );
+            const data = await response.json();
+            const address = data.features[0]?.place_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            onLocationSelect(lat, lng, address);
+          } catch (error) {
+            onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
           }
         });
 
-        setMap(googleMap);
-        setMarker(mapMarker);
-        setIsLoading(false);
+        mapboxMap.on('load', () => {
+          setIsLoading(false);
+        });
+
+        setMap(mapboxMap);
+        setMarker(mapboxMarker);
       } catch (error) {
-        console.error('Error loading Google Maps:', error);
+        console.error('Error loading Mapbox:', error);
         setIsLoading(false);
       }
     };
@@ -124,18 +110,19 @@ export const LocationMap: React.FC<LocationMapProps> = ({
   const handleSearch = async () => {
     if (!searchValue.trim() || !map) return;
 
-    const geocoder = new google.maps.Geocoder();
     try {
-      const response = await geocoder.geocode({ address: searchValue });
-      if (response.results[0]) {
-        const location = response.results[0].geometry.location;
-        const lat = location.lat();
-        const lng = location.lng();
-        const address = response.results[0].formatted_address;
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchValue)}.json?access_token=${MAPBOX_API_KEY}`
+      );
+      const data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        const address = data.features[0].place_name;
 
-        map.setCenter({ lat, lng });
+        map.setCenter([lng, lat]);
         map.setZoom(12);
-        marker?.setPosition({ lat, lng });
+        marker?.setLngLat([lng, lat]);
         
         onLocationSelect(lat, lng, address);
       }
@@ -153,15 +140,17 @@ export const LocationMap: React.FC<LocationMapProps> = ({
           const lng = position.coords.longitude;
 
           if (map && marker) {
-            map.setCenter({ lat, lng });
+            map.setCenter([lng, lat]);
             map.setZoom(12);
-            marker.setPosition({ lat, lng });
+            marker.setLngLat([lng, lat]);
 
-            // Get address
-            const geocoder = new google.maps.Geocoder();
+            // Get address using reverse geocoding
             try {
-              const response = await geocoder.geocode({ location: { lat, lng } });
-              const address = response.results[0]?.formatted_address || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+              const response = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_API_KEY}`
+              );
+              const data = await response.json();
+              const address = data.features[0]?.place_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
               onLocationSelect(lat, lng, address);
             } catch (error) {
               onLocationSelect(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);

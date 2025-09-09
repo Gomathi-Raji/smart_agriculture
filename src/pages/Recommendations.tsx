@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MapPin, Sparkles, Leaf, Apple, Carrot, Thermometer, Droplets } from 'lucide-react';
+import { Loader2, MapPin, Sparkles, Leaf, Apple, Carrot, Thermometer, Droplets, Map } from 'lucide-react';
 import { useWeather } from '@/hooks/useWeather';
 import { toast } from '@/hooks/use-toast';
+import { LocationMapSelector } from '@/components/LocationMapSelector';
 
 interface CropRecommendation {
   category: 'crop' | 'vegetable' | 'fruit';
@@ -34,6 +35,7 @@ export default function Recommendations() {
   const [recommendations, setRecommendations] = useState<RecommendationResponse | null>(null);
   const [geminiApiKey] = useState('AIzaSyBmlIUNvfTAacQ3K_wb7RDMwKF8Fo2XiaE'); // User-provided API key
   const { weatherData } = useWeather();
+  const [showMapSelector, setShowMapSelector] = useState(false);
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -405,6 +407,14 @@ Make sure to follow this exact structure and format for proper parsing.`;
                 >
                   <MapPin className="h-4 w-4" />
                 </Button>
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => setShowMapSelector(true)}
+                  title="Select location on map"
+                >
+                  <Map className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             
@@ -629,6 +639,20 @@ Make sure to follow this exact structure and format for proper parsing.`;
           </div>
         </div>
       )}
+
+      {/* Location Map Selector Modal */}
+      <LocationMapSelector
+        isVisible={showMapSelector}
+        onClose={() => setShowMapSelector(false)}
+        onLocationSelect={(selectedLocation) => {
+          setLocation(selectedLocation);
+          toast({
+            title: "Location selected",
+            description: `Location set to: ${selectedLocation}`,
+          });
+        }}
+        currentLocation={location}
+      />
     </div>
   );
 }

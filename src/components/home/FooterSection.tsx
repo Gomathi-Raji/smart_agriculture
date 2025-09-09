@@ -116,9 +116,11 @@ export function FooterSection() {
               className="lg:col-span-2"
             >
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-secondary rounded-lg flex items-center justify-center">
-                  <Leaf className="h-6 w-6 text-secondary-foreground" />
-                </div>
+                <img 
+                  src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                  alt="AgriSmart Logo" 
+                  className="w-10 h-10 object-contain"
+                />
                 <div>
                   <h3 className="text-xl font-bold">AgriSmart</h3>
                   <p className="text-xs text-primary-foreground/70">AI-Powered Farming</p>

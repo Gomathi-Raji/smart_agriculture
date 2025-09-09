@@ -16,9 +16,11 @@ const NotFound = () => {
       <Card className="max-w-md w-full shadow-elegant">
         <CardContent className="p-8 text-center">
           {/* Logo */}
-          <div className="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center mx-auto mb-6">
-            <Leaf className="h-8 w-8 text-primary-foreground" />
-          </div>
+          <img 
+            src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+            alt="AgriSmart Logo" 
+            className="w-16 h-16 object-contain mx-auto mb-6"
+          />
           
           <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
           <h2 className="text-2xl font-semibold mb-2">Page Not Found</h2>

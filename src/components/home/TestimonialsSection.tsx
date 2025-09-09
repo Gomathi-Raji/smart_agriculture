@@ -1,6 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, Quote } from "lucide-react";
+import rajeshKumarAvatar from "@/assets/rajesh-kumar-avatar.jpg";
+import priyaSharmaAvatar from "@/assets/priya-sharma-avatar.jpg";
+import muruganAvatar from "@/assets/murugan-avatar.jpg";
+import fatimaBegumAvatar from "@/assets/fatima-begum-avatar.jpg";
+import harpreetSinghAvatar from "@/assets/harpreet-singh-avatar.jpg";
+import lakshmiDeviAvatar from "@/assets/lakshmi-devi-avatar.jpg";
 
 export function TestimonialsSection() {
   const testimonials = [
@@ -10,7 +16,7 @@ export function TestimonialsSection() {
       crop: "Wheat & Rice Farmer",
       rating: 5,
       quote: "AgriSmart helped me detect wheat rust disease early and saved 80% of my crop. The AI is incredibly accurate and the treatment suggestions worked perfectly!",
-      avatar: "/placeholder.svg",
+      avatar: rajeshKumarAvatar,
       savings: "₹2,50,000 saved"
     },
     {
@@ -19,7 +25,7 @@ export function TestimonialsSection() {
       crop: "Cotton Farmer",
       rating: 5,
       quote: "The marketplace feature is amazing! I sold my cotton at 15% higher prices than local mandis. The price predictions were spot on.",
-      avatar: "/placeholder.svg",
+      avatar: priyaSharmaAvatar,
       earnings: "15% more income"
     },
     {
@@ -28,7 +34,7 @@ export function TestimonialsSection() {
       crop: "Tomato & Chilli Farmer",
       rating: 5,
       quote: "Voice assistant in Tamil language is a game-changer. I can get farming advice while working in fields without touching my phone.",
-      avatar: "/placeholder.svg",
+      avatar: muruganAvatar,
       benefit: "Hands-free farming"
     },
     {
@@ -37,7 +43,7 @@ export function TestimonialsSection() {
       crop: "Mixed Crop Farmer",
       rating: 5,
       quote: "Government scheme notifications helped me get ₹50,000 subsidy for drip irrigation. I wouldn't have known about it otherwise!",
-      avatar: "/placeholder.svg",
+      avatar: fatimaBegumAvatar,
       subsidy: "₹50,000 subsidy"
     },
     {
@@ -46,7 +52,7 @@ export function TestimonialsSection() {
       crop: "Sugarcane Farmer",
       rating: 5,
       quote: "Weather alerts saved my sugarcane crop from unexpected frost. The hyperlocal forecasts are more accurate than TV weather!",
-      avatar: "/placeholder.svg",
+      avatar: harpreetSinghAvatar,
       yield: "95% yield protected"
     },
     {
@@ -55,7 +61,7 @@ export function TestimonialsSection() {
       crop: "Rice & Vegetable Farmer",
       rating: 5,
       quote: "The community feature connected me with experienced farmers. Their advice helped me increase my vegetable yield by 40%.",
-      avatar: "/placeholder.svg",
+      avatar: lakshmiDeviAvatar,
       growth: "40% yield increase"
     }
   ];

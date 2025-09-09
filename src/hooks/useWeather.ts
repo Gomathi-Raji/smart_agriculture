@@ -7,7 +7,7 @@ export const useWeather = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchWeather = async (lat?: number, lng?: number) => {
+  const fetchWeather = async (lat?: number, lng?: number, address?: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -15,11 +15,37 @@ export const useWeather = () => {
       let locationData: LocationData;
       
       if (lat && lng) {
-        locationData = {
-          latitude: lat,
-          longitude: lng,
-          address: `${lat.toFixed(2)}°N ${lng.toFixed(2)}°E`
-        };
+        // Use provided coordinates and address if available
+        if (address) {
+          locationData = {
+            latitude: lat,
+            longitude: lng,
+            address
+          };
+        } else {
+          // Get address from coordinates using reverse geocoding for better accuracy
+          try {
+            const MAPBOX_API_KEY = 'pk.eyJ1IjoiaGFyaXNod2FyYW4iLCJhIjoiY21hZHhwZGs2MDF4YzJxczh2aDd0cWg1MyJ9.qcu0lpqVlZlC2WFxhwb1Pg';
+            const response = await fetch(
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_API_KEY}`
+            );
+            const data = await response.json();
+            const resolvedAddress = data.features?.[0]?.place_name || `${lat.toFixed(6)}°N, ${lng.toFixed(6)}°E`;
+            
+            locationData = {
+              latitude: lat,
+              longitude: lng,
+              address: resolvedAddress
+            };
+          } catch (error) {
+            console.error('Reverse geocoding failed:', error);
+            locationData = {
+              latitude: lat,
+              longitude: lng,
+              address: `${lat.toFixed(6)}°N, ${lng.toFixed(6)}°E`
+            };
+          }
+        }
       } else {
         locationData = await getCurrentLocation();
       }
@@ -45,6 +71,6 @@ export const useWeather = () => {
     location,
     loading,
     error,
-    refetch: fetchWeather,
+    refetch: (lat?: number, lng?: number, address?: string) => fetchWeather(lat, lng, address),
   };
 };

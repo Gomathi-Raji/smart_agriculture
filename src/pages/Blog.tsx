@@ -16,6 +16,12 @@ import {
   Clock,
   ArrowRight
 } from "lucide-react";
+import aiFeaturedImage from "@/assets/ai-agriculture-featured.jpg";
+import wheatPricesImage from "@/assets/wheat-prices-article.jpg";
+import organicFarmingImage from "@/assets/organic-farming-article.jpg";
+import monsoonForecastImage from "@/assets/monsoon-forecast-article.jpg";
+import smartIrrigationImage from "@/assets/smart-irrigation-article.jpg";
+import solarFarmingImage from "@/assets/solar-farming-article.jpg";
 
 export default function Blog() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +44,7 @@ export default function Blog() {
     category: "Technology",
     views: 15420,
     likes: 892,
-    image: "/api/placeholder/800/400",
+    image: aiFeaturedImage,
     featured: true
   };
 
@@ -53,7 +59,7 @@ export default function Blog() {
       category: "Market Trends",
       views: 8950,
       likes: 234,
-      image: "/api/placeholder/400/250"
+      image: wheatPricesImage
     },
     {
       id: 3,
@@ -65,7 +71,7 @@ export default function Blog() {
       category: "Crop Management",
       views: 12300,
       likes: 567,
-      image: "/api/placeholder/400/250"
+      image: organicFarmingImage
     },
     {
       id: 4,
@@ -77,7 +83,7 @@ export default function Blog() {
       category: "Weather Updates",
       views: 6780,
       likes: 189,
-      image: "/api/placeholder/400/250"
+      image: monsoonForecastImage
     },
     {
       id: 5,
@@ -89,7 +95,7 @@ export default function Blog() {
       category: "Technology",
       views: 9840,
       likes: 445,
-      image: "/api/placeholder/400/250"
+      image: smartIrrigationImage
     },
     {
       id: 6,
@@ -101,7 +107,7 @@ export default function Blog() {
       category: "Technology",
       views: 11200,
       likes: 678,
-      image: "/api/placeholder/400/250"
+      image: solarFarmingImage
     }
   ];
 
@@ -204,8 +210,12 @@ export default function Blog() {
             </div>
             <div className="md:flex">
               {/* Image */}
-              <div className="md:w-1/2 h-64 md:h-auto bg-accent/50 flex items-center justify-center">
-                <BookOpen className="h-24 w-24 text-muted-foreground" />
+              <div className="md:w-1/2 h-64 md:h-auto overflow-hidden">
+                <img 
+                  src={featuredArticle.image} 
+                  alt={featuredArticle.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               {/* Content */}
@@ -274,8 +284,12 @@ export default function Blog() {
             {filteredArticles.map((article) => (
               <Card key={article.id} className="shadow-elegant hover:shadow-glow transition-all duration-300 animate-fade-in">
                 {/* Image */}
-                <div className="h-48 bg-accent/50 flex items-center justify-center rounded-t-lg">
-                  <BookOpen className="h-16 w-16 text-muted-foreground" />
+                <div className="h-48 overflow-hidden rounded-t-lg">
+                  <img 
+                    src={article.image} 
+                    alt={article.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
 
                 <CardContent className="p-6">

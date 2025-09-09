@@ -24,6 +24,9 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
+import premiumTomatoes from "@/assets/premium-tomatoes.jpg";
+import organicWheatSeeds from "@/assets/organic-wheat-seeds.jpg";
+import npkFertilizer from "@/assets/npk-fertilizer.jpg";
 
 export default function SellerPanel() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -46,7 +49,7 @@ export default function SellerPanel() {
       sold: 150,
       status: "active",
       rating: 4.8,
-      image: "/api/placeholder/200/150"
+      image: premiumTomatoes
     },
     {
       id: 2,
@@ -57,7 +60,7 @@ export default function SellerPanel() {
       sold: 25,
       status: "low-stock",
       rating: 4.9,
-      image: "/api/placeholder/200/150"
+      image: organicWheatSeeds
     },
     {
       id: 3,
@@ -68,7 +71,7 @@ export default function SellerPanel() {
       sold: 75,
       status: "out-of-stock",
       rating: 4.6,
-      image: "/api/placeholder/200/150"
+      image: npkFertilizer
     }
   ];
 

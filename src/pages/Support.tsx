@@ -273,7 +273,7 @@ export default function Support() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Average Response Time</span>
-                  <Badge variant="secondary">< 30 minutes</Badge>
+                  <Badge variant="secondary">&lt; 30 minutes</Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Customer Satisfaction</span>

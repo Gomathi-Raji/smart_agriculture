@@ -14,9 +14,11 @@ export default function Auth() {
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Leaf className="h-7 w-7 text-primary-foreground" />
-            </div>
+            <img 
+              src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+              alt="AgriSmart Logo" 
+              className="w-12 h-12 object-contain"
+            />
             <span className="font-bold text-2xl text-primary">AgriSmart</span>
           </Link>
           <p className="text-muted-foreground">

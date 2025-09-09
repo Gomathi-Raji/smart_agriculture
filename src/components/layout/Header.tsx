@@ -85,9 +85,11 @@ export function Header() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Leaf className="h-6 w-6 text-primary-foreground" />
-              </div>
+              <img 
+                src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                alt="AgriSmart Logo" 
+                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-primary">AgriSmart</span>
                 <span className="text-xs text-muted-foreground hidden sm:block">Smart Farming Solutions</span>

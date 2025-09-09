@@ -11,7 +11,6 @@ import {
   DollarSign, 
   Users, 
   FileText,
-  Bot,
   CheckCircle,
   AlertTriangle,
   Info
@@ -20,7 +19,6 @@ import {
 export default function GovernmentSchemes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showChatbot, setShowChatbot] = useState(false);
 
   const categories = [
     { name: "Subsidies", count: 25, icon: DollarSign },
@@ -120,50 +118,27 @@ export default function GovernmentSchemes() {
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {/* Search & AI Assistant */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card className="shadow-elegant">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search schemes by name, category, or benefits..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    Filters
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div>
-            <Card className="shadow-elegant bg-gradient-card">
-              <CardContent className="p-6 text-center">
-                <Bot className="h-12 w-12 mx-auto mb-3 text-primary" />
-                <h3 className="font-semibold mb-2">AI Scheme Assistant</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Get personalized scheme recommendations
-                </p>
-                <Button 
-                  variant="hero" 
-                  className="w-full"
-                  onClick={() => setShowChatbot(!showChatbot)}
-                >
-                  <Bot className="mr-2 h-4 w-4" />
-                  Ask AI
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        {/* Government schemes content */}
+        {/* Search */}
+        <Card className="shadow-elegant">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search schemes by name, category, or benefits..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
 
         {/* Categories */}

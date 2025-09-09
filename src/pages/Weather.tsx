@@ -127,7 +127,7 @@ export default function Weather() {
   // Handle location selection from map
   const handleLocationSelect = (lat: number, lng: number, address: string) => {
     setSelectedLocation({ lat, lng, address });
-    refetch(lat, lng);
+    refetch(lat, lng, address);
     setIsMapOpen(false);
   };
 
@@ -139,7 +139,7 @@ export default function Weather() {
     visibility: Math.round(weatherData.hourly.visibility[0] / 1000) || 10, // Convert to km
     uvIndex: Math.round(weatherData.hourly.uv_index[0] || 0),
     icon: CurrentWeatherIcon,
-    location: selectedLocation?.address || location?.address || "Agricultural Technology Center, Innovation Hub, Sector 18, New Delhi, India 110001"
+    location: selectedLocation?.address || location?.address || "Getting your precise location..."
   };
 
   // Advanced agricultural data

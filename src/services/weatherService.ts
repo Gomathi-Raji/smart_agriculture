@@ -140,31 +140,41 @@ export const getCurrentLocation = (): Promise<LocationData> => {
         const { latitude, longitude } = position.coords;
         
         try {
-          // Get address from coordinates using reverse geocoding
+          // Use Mapbox reverse geocoding for better accuracy
+          const MAPBOX_API_KEY = 'pk.eyJ1IjoiaGFyaXNod2FyYW4iLCJhIjoiY21hZHhwZGs2MDF4YzJxczh2aDd0cWg1MyJ9.qcu0lpqVlZlC2WFxhwb1Pg';
           const response = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m`
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_API_KEY}`
           );
+          const data = await response.json();
+          const address = data.features?.[0]?.place_name || `${latitude.toFixed(6)}°N, ${longitude.toFixed(6)}°E`;
           
           resolve({
             latitude,
             longitude,
-            address: `${latitude.toFixed(2)}°N ${longitude.toFixed(2)}°E`
+            address
           });
         } catch (error) {
+          console.error('Reverse geocoding error:', error);
           resolve({
             latitude,
             longitude,
-            address: 'Agricultural Technology Center, Innovation Hub, Sector 18, New Delhi, India 110001'
+            address: `${latitude.toFixed(6)}°N, ${longitude.toFixed(6)}°E`
           });
         }
       },
       (error) => {
+        console.error('Geolocation error:', error);
         // Fallback to Delhi coordinates
         resolve({
           latitude: 28.7041,
           longitude: 77.1025,
-          address: 'Agricultural Technology Center, Innovation Hub, Sector 18, New Delhi, India 110001'
+          address: 'New Delhi, India'
         });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
       }
     );
   });
