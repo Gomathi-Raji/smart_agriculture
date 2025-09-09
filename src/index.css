@@ -60,17 +60,23 @@ All colors MUST be HSL.
     --info: 200 80% 45%;
     --info-foreground: 0 0% 98%;
 
-    /* Gradients */
+    /* Advanced Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(120 60% 25%), hsl(120 45% 35%));
     --gradient-secondary: linear-gradient(135deg, hsl(48 95% 55%), hsl(48 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(120 60% 25%), hsl(120 45% 35%), hsl(48 95% 55%));
+    --gradient-hero: radial-gradient(ellipse at top, hsl(120 50% 15%), hsl(120 60% 25%)), linear-gradient(135deg, hsl(120 60% 25%), hsl(120 45% 35%), hsl(48 95% 55%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(120 25% 98%));
+    --gradient-advanced: linear-gradient(135deg, hsl(120 65% 20%), hsl(120 55% 30%), hsl(120 45% 40%));
+    --gradient-feature: linear-gradient(145deg, hsl(120 20% 98%), hsl(120 15% 96%));
+    --gradient-tech: radial-gradient(circle at center, hsl(120 40% 90%), hsl(120 25% 95%));
 
-    /* Shadows */
+    /* Advanced Shadows */
     --shadow-primary: 0 10px 30px -10px hsl(120 60% 25% / 0.3);
     --shadow-secondary: 0 10px 30px -10px hsl(48 95% 55% / 0.3);
     --shadow-elegant: 0 20px 40px -10px hsl(120 20% 12% / 0.1);
     --shadow-glow: 0 0 40px hsl(120 45% 35% / 0.4);
+    --shadow-advanced: 0 25px 50px -15px hsl(120 60% 25% / 0.4);
+    --shadow-tech: 0 8px 25px -8px hsl(120 40% 30% / 0.15);
+    --shadow-floating: 0 35px 60px -15px hsl(120 50% 20% / 0.3);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -96,61 +102,62 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark mode for AgriSmart */
-    --background: 120 25% 8%;
-    --foreground: 120 15% 92%;
+    /* Dark mode for AgriSmart - True Black Theme */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
 
-    --card: 120 20% 12%;
-    --card-foreground: 120 15% 92%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 120 20% 12%;
-    --popover-foreground: 120 15% 92%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 120 45% 35%;
+    /* Keep same green as light mode */
+    --primary: 120 60% 25%;
     --primary-foreground: 0 0% 98%;
-    --primary-glow: 120 35% 45%;
+    --primary-glow: 120 45% 35%;
 
-    --secondary: 48 85% 65%;
-    --secondary-foreground: 120 20% 12%;
-    --secondary-glow: 48 75% 75%;
+    --secondary: 48 95% 55%;
+    --secondary-foreground: 0 0% 0%;
+    --secondary-glow: 48 85% 65%;
 
-    --muted: 120 15% 15%;
-    --muted-foreground: 120 10% 60%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 120 30% 20%;
-    --accent-foreground: 120 45% 80%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 85%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 120 15% 18%;
-    --input: 120 15% 15%;
-    --ring: 120 45% 35%;
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 120 60% 25%;
 
     /* Dark mode custom tokens */
-    --success: 120 50% 45%;
+    --success: 120 60% 35%;
     --success-foreground: 0 0% 98%;
     
-    --warning: 48 85% 65%;
-    --warning-foreground: 120 20% 12%;
+    --warning: 48 95% 55%;
+    --warning-foreground: 0 0% 0%;
     
-    --info: 200 70% 55%;
+    --info: 200 80% 45%;
     --info-foreground: 0 0% 98%;
 
-    /* Dark gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(120 45% 35%), hsl(120 35% 45%));
-    --gradient-secondary: linear-gradient(135deg, hsl(48 85% 65%), hsl(48 75% 75%));
-    --gradient-hero: linear-gradient(135deg, hsl(120 45% 35%), hsl(120 35% 45%), hsl(48 85% 65%));
-    --gradient-card: linear-gradient(145deg, hsl(120 20% 12%), hsl(120 15% 15%));
+    /* Dark gradients with same green */
+    --gradient-primary: linear-gradient(135deg, hsl(120 60% 25%), hsl(120 45% 35%));
+    --gradient-secondary: linear-gradient(135deg, hsl(48 95% 55%), hsl(48 85% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(120 60% 25%), hsl(120 45% 35%), hsl(48 95% 55%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 5%), hsl(0 0% 8%));
 
-    --sidebar-background: 120 20% 10%;
-    --sidebar-foreground: 120 15% 85%;
-    --sidebar-primary: 120 45% 35%;
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 120 60% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 120 15% 15%;
-    --sidebar-accent-foreground: 120 15% 85%;
-    --sidebar-border: 120 15% 15%;
-    --sidebar-ring: 120 45% 35%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 0 0% 10%;
+    --sidebar-ring: 120 60% 25%;
   }
 }
 

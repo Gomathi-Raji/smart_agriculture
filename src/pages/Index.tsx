@@ -1,8 +1,14 @@
 import { HeroSection } from "@/components/home/HeroSection";
+import { ProblemSolutionSection } from "@/components/home/ProblemSolutionSection";
 import { StatsSection } from "@/components/home/StatsSection";
-import { FeaturesSection } from "@/components/home/FeaturesSection";
+import { InnovationSection } from "@/components/home/InnovationSection"; 
+import { DashboardPreviewSection } from "@/components/home/DashboardPreviewSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { IntegrationSection } from "@/components/home/IntegrationSection";
+import { PricingSection } from "@/components/home/PricingSection";
 import { CTASection } from "@/components/home/CTASection";
+import { FAQSection } from "@/components/home/FAQSection";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -16,23 +22,38 @@ import {
 const Index = () => {
   const navigate = useNavigate();
   
-  // Force refresh to clear cache
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Stats Section */}
+      {/* Problem & Solution Section */}
+      <ProblemSolutionSection />
+
+      {/* Impact Metrics Section */}
       <StatsSection />
 
-      {/* Features Section */}
-      <FeaturesSection />
+      {/* Innovation Section */}
+      <InnovationSection />
 
-      {/* Testimonials Section */}
+      {/* Smart Dashboard Preview */}
+      <DashboardPreviewSection />
+
+      {/* Case Study / Testimonial Section */}
       <TestimonialsSection />
 
-      {/* CTA Section */}
+      {/* Integration Section */}
+      <IntegrationSection />
+
+      {/* Pricing Plans Section */}
+      <PricingSection />
+
+      {/* Call-to-Action Section */}
       <CTASection />
+
+      {/* FAQ Section */}
+      <FAQSection />
+
 
       {/* Quick Actions for Mobile */}
       <div className="md:hidden pb-20">

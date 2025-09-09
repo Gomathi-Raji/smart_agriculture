@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 // import { LanguageToggle } from "@/components/LanguageToggle";
 // import { useLanguage } from "@/contexts/LanguageContext";
 import { 
@@ -15,7 +17,9 @@ import {
   Users,
   MessageCircle,
   Cloud,
-  Sparkles
+  Sparkles,
+  Bell,
+  Search
 } from "lucide-react";
 
 export function Navigation() {
@@ -76,8 +80,19 @@ export function Navigation() {
                 </Link>
               ))}
 
-              {/* Language Toggle - Temporarily disabled */}
-              {/* <LanguageToggle /> */}
+              {/* Theme Toggle and Search */}
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon">
+                  <Search className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="relative">
+                  <Bell className="h-4 w-4" />
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center">
+                    3
+                  </Badge>
+                </Button>
+                <ThemeToggle />
+              </div>
 
               {/* Authentication */}
               <SignedOut>
@@ -176,8 +191,14 @@ export function Navigation() {
           </Link>
           
           <div className="flex items-center space-x-2">
-            {/* Language toggle temporarily disabled */}
-            {/* <LanguageToggle /> */}
+            {/* Notifications and Theme for Mobile */}
+            <Button variant="outline" size="icon" className="relative">
+              <Bell className="h-4 w-4" />
+              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 text-xs p-0 flex items-center justify-center">
+                3
+              </Badge>
+            </Button>
+            <ThemeToggle />
             <SignedOut>
               <Link to="/auth">
                 <Button variant="outline" size="icon">

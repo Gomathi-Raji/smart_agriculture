@@ -2,6 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { 
   User, 
   MapPin, 
@@ -71,8 +76,8 @@ export default function UserProfile() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Profile Card */}
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Profile Header Card */}
         <Card className="shadow-elegant">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -95,7 +100,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Quick Actions */}
+              {/* Quick Profile Actions */}
               <div className="flex-1 md:text-right space-y-2">
                 <Button variant="outline" size="sm" className="w-full md:w-auto">
                   <Edit className="h-4 w-4 mr-2" />
@@ -134,122 +139,59 @@ export default function UserProfile() {
           </CardContent>
         </Card>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <Card key={stat.label} className="text-center">
-              <CardContent className="p-4">
-                <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <stat.icon className="h-5 w-5 text-primary" />
+        {/* Dashboard Metrics */}
+        <DashboardMetrics userType="farmer" />
+
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Charts and Data */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Revenue Chart */}
+            <RevenueChart userType="farmer" />
+
+            {/* Farm Details Card */}
+            <Card className="shadow-elegant">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Leaf className="h-5 w-5 text-primary" />
+                  Farm Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-2">Farm Size</h4>
+                    <p className="text-2xl font-bold text-primary">{farmerData.farmSize}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Experience</h4>
+                    <p className="text-2xl font-bold text-primary">{farmerData.experience}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Main Crops</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {farmerData.crops.map((crop) => (
+                        <Badge key={crop} variant="secondary">{crop}</Badge>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
               </CardContent>
             </Card>
-          ))}
+
+            {/* Quick Actions */}
+            <QuickActions userType="farmer" />
+          </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-8">
+            {/* Activity Feed */}
+            <ActivityFeed userType="farmer" limit={6} />
+
+            {/* Notification Center */}
+            <NotificationCenter userType="farmer" />
+          </div>
         </div>
-
-        {/* Farm Details */}
-        <Card className="shadow-elegant">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Leaf className="h-5 w-5 text-primary" />
-              Farm Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-2">Farm Size</h4>
-                <p className="text-2xl font-bold text-primary">{farmerData.farmSize}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Experience</h4>
-                <p className="text-2xl font-bold text-primary">{farmerData.experience}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Main Crops</h4>
-                <div className="flex flex-wrap gap-2">
-                  {farmerData.crops.map((crop) => (
-                    <Badge key={crop} variant="secondary">{crop}</Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="shadow-elegant">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {activities.map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-4 p-4 bg-accent/50 rounded-lg"
-                >
-                  <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      activity.type === "diagnosis"
-                        ? "bg-primary/20"
-                        : activity.type === "market"
-                        ? "bg-success/20"
-                        : "bg-secondary/20"
-                    }`}
-                  >
-                    {activity.type === "diagnosis" && <Camera className="h-5 w-5 text-primary" />}
-                    {activity.type === "market" && <TrendingUp className="h-5 w-5 text-success" />}
-                    {activity.type === "purchase" && <ShoppingCart className="h-5 w-5 text-secondary-foreground" />}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h4 className="font-medium">{activity.title}</h4>
-                    <p className="text-sm text-muted-foreground">{activity.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{activity.date}</p>
-                  </div>
-                  
-                  <Badge
-                    variant={
-                      activity.status === "resolved" || activity.status === "completed" || activity.status === "delivered"
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {activity.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="bg-gradient-card">
-          <CardContent className="p-6">
-            <h3 className="font-semibold mb-4">Quick Actions</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                <Camera className="h-5 w-5" />
-                <span className="text-sm">New Diagnosis</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                <TrendingUp className="h-5 w-5" />
-                <span className="text-sm">Market Prices</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                <span className="text-sm">Marketplace</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-                <Bell className="h-5 w-5" />
-                <span className="text-sm">Notifications</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

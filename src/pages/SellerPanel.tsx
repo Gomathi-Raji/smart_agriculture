@@ -5,6 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { 
   Plus, 
   Edit, 
@@ -100,48 +105,60 @@ export default function SellerPanel() {
   };
 
   const renderDashboard = () => (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {sellerStats.map((stat) => (
-          <Card key={stat.label} className="animate-fade-in">
-            <CardContent className="p-4 text-center">
-              <div className={`w-10 h-10 bg-${stat.color}/20 rounded-lg flex items-center justify-center mx-auto mb-2`}>
-                <stat.icon className={`h-5 w-5 text-${stat.color}`} />
+    <div className="space-y-8">
+      {/* Dashboard Metrics */}
+      <DashboardMetrics userType="seller" />
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Revenue Chart */}
+          <RevenueChart userType="seller" />
+
+          {/* Recent Orders */}
+          <Card className="shadow-elegant">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Recent Orders
+                <Badge variant="secondary">{recentOrders.length} orders</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-4 bg-accent/50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">{order.product}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {order.buyer} • {order.quantity} • {order.date}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold">₹{order.amount}</p>
+                      <Badge variant={getStatusColor(order.status) as any}>
+                        {order.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <p className={`text-2xl font-bold text-${stat.color}`}>{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Recent Orders */}
-      <Card className="shadow-elegant">
-        <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {recentOrders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 bg-accent/50 rounded-lg">
-                <div>
-                  <h4 className="font-medium">{order.product}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {order.buyer} • {order.quantity} • {order.date}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">₹{order.amount}</p>
-                  <Badge variant={getStatusColor(order.status) as any}>
-                    {order.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          {/* Quick Actions */}
+          <QuickActions userType="seller" />
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-8">
+          {/* Activity Feed */}
+          <ActivityFeed userType="seller" limit={6} />
+
+          {/* Notification Center */}
+          <NotificationCenter userType="seller" />
+        </div>
+      </div>
     </div>
   );
 
@@ -294,7 +311,7 @@ export default function SellerPanel() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6">
         {/* Navigation Tabs */}
         <div className="flex gap-2 mb-8 bg-card p-2 rounded-lg shadow-sm">
           <Button

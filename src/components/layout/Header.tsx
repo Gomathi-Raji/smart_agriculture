@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { SettingsModal } from "@/components/SettingsModal";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,7 @@ import {
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const location = useLocation();
   const { logout, isAuthenticated, isClerkUser, userRole } = useAuth();
   const { signOut } = useClerk();
@@ -52,17 +54,27 @@ export function Header() {
     { name: "Home", path: "/", icon: Home },
     { name: "Diagnose", path: "/diagnose", icon: Camera },
     { name: "Marketplace", path: "/buy", icon: ShoppingCart },
-    { name: "Analysis", path: "/market-analysis", icon: TrendingUp },
-    { name: "Recommendation", path: "/recommendations", icon: Sparkles },
   ];
 
-  const moreItems = [
-    { name: "Crops & Hybrids", path: "/crops-hybrid", icon: Leaf },
+  const analyticsItems = [
+    { name: "Market Analysis", path: "/market-analysis", icon: TrendingUp },
+    { name: "Recommendations", path: "/recommendations", icon: Sparkles },
+  ];
+
+  const resourcesItems = [
     { name: "Government Schemes", path: "/government-schemes", icon: Users },
+    { name: "Weather", path: "/weather", icon: Cloud },
+    { name: "Crops & Hybrids", path: "/hybrid", icon: Leaf },
+    { name: "News & Blogs", path: "/blogs", icon: MessageCircle },
+  ];
+
+  const toolsItems = [
+    { name: "AI Chatbot", path: "/chatbot", icon: MessageCircle },
+  ];
+
+  const adminItems = [
     { name: "Seller Panel", path: "/seller-panel", icon: ShoppingCart },
     { name: "Admin Panel", path: "/admin", icon: Users },
-    { name: "News & Blogs", path: "/blogs", icon: MessageCircle },
-    { name: "Support", path: "/support", icon: MessageCircle },
   ];
 
   return (
@@ -98,6 +110,96 @@ export function Header() {
                    {item.name && <span>{item.name}</span>}
                  </Link>
               ))}
+              
+              {/* Analytics Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium ${
+                      analyticsItems.some(item => isActive(item.path))
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                    <span>Analytics</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-card border border-border">
+                  {analyticsItems.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link 
+                        to={item.path} 
+                        className={`cursor-pointer ${isActive(item.path) ? 'text-primary' : ''}`}
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Resources Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium ${
+                      resourcesItems.some(item => isActive(item.path))
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Leaf className="h-4 w-4" />
+                    <span>Resources</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-card border border-border">
+                  {resourcesItems.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link 
+                        to={item.path} 
+                        className={`cursor-pointer ${isActive(item.path) ? 'text-primary' : ''}`}
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Tools Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium ${
+                      toolsItems.some(item => isActive(item.path))
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    <span>Tools</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-card border border-border">
+                  {toolsItems.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link 
+                        to={item.path} 
+                        className={`cursor-pointer ${isActive(item.path) ? 'text-primary' : ''}`}
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
 
             {/* Right Actions */}
@@ -161,8 +263,30 @@ export function Header() {
                 </Button>
               </Link>
               
-              {/* Role-based Authentication Button */}
+              {/* Role-based Admin Dropdowns */}
               <RoleBasedAuth />
+
+              {isAuthenticated && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="hidden md:flex">
+                      <Users className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-card border border-border">
+                    <DropdownMenuLabel>Admin Tools</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {adminItems.map((item) => (
+                      <DropdownMenuItem key={item.path} asChild>
+                        <Link to={item.path} className="cursor-pointer">
+                          <item.icon className="mr-2 h-4 w-4" />
+                          <span>{item.name}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
 
               {/* Authentication */}
@@ -199,11 +323,9 @@ export function Header() {
                         <span>Profile</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/user-profile" className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
+                    <DropdownMenuItem onClick={() => setIsSettingsOpen(true)} className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
@@ -231,11 +353,9 @@ export function Header() {
                         <span>Profile</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/user-profile" className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
+                    <DropdownMenuItem onClick={() => setIsSettingsOpen(true)} className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
@@ -263,7 +383,8 @@ export function Header() {
         {isMenuOpen && (
           <div className="lg:hidden border-t border-border bg-card/95 backdrop-blur-sm">
             <div className="px-4 py-4 space-y-2">
-              {[...navItems, ...moreItems].map((item) => (
+              {/* Main nav items */}
+              {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -278,6 +399,66 @@ export function Header() {
                    {item.name && <span className="font-medium">{item.name}</span>}
                  </Link>
               ))}
+              
+              {/* Analytics items */}
+              <div className="border-t border-border pt-2 mt-2">
+                <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Analytics</p>
+                {analyticsItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                   >
+                     <item.icon className="h-5 w-5" />
+                     {item.name && <span className="font-medium">{item.name}</span>}
+                   </Link>
+                ))}
+              </div>
+              
+              {/* Resources items */}
+              <div className="border-t border-border pt-2 mt-2">
+                <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
+                {resourcesItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                   >
+                     <item.icon className="h-5 w-5" />
+                     {item.name && <span className="font-medium">{item.name}</span>}
+                   </Link>
+                ))}
+              </div>
+              
+              {/* Tools items */}
+              <div className="border-t border-border pt-2 mt-2">
+                <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
+                {toolsItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                   >
+                     <item.icon className="h-5 w-5" />
+                     {item.name && <span className="font-medium">{item.name}</span>}
+                   </Link>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -303,6 +484,9 @@ export function Header() {
           
         </div>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </>
   );
 }

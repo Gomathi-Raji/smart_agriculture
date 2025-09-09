@@ -133,9 +133,7 @@ export function Footer() {
                 <MapPin className="h-5 w-5 text-primary mt-0.5" />
                 <div>
                   <p className="text-sm text-muted-foreground">
-
-                    Jawaharlal Nehru Salai, Vadapalani, Chennai, Tamil Nadu 600026
-
+                   Jawaharlal Nehru Salai, Vadapalani, Chennai, Tamil Nadu 600026
                   </p>
                 </div>
               </div>

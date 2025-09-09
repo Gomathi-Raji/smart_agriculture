@@ -7,6 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { RevenueChart } from '@/components/dashboard/RevenueChart';
+import { NotificationCenter } from '@/components/dashboard/NotificationCenter';
 import { 
   Users, 
   Settings, 
@@ -171,101 +176,59 @@ export default function Admin() {
           </TabsList>
 
           {/* Dashboard Tab */}
-          <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatsCard 
-                title="Total Users" 
-                value={mockStats.totalUsers.toLocaleString()} 
-                icon={Users}
-                trend="+8.2%"
-              />
-              <StatsCard 
-                title="Active Users" 
-                value={mockStats.activeUsers.toLocaleString()} 
-                icon={UserCheck}
-                trend="+12.5%"
-              />
-              <StatsCard 
-                title="Total Sellers" 
-                value={mockStats.totalSellers.toLocaleString()} 
-                icon={TrendingUp}
-                trend="+5.1%"
-              />
-              <StatsCard 
-                title="Revenue" 
-                value={mockStats.totalRevenue} 
-                icon={Database}
-                trend="+18.3%"
-              />
-            </div>
+          <TabsContent value="dashboard" className="space-y-8">
+            {/* Dashboard Metrics */}
+            <DashboardMetrics userType="admin" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Activity className="h-5 w-5" />
-                    <span>Recent Activity</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <UserCheck className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">New user registered</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">2 min ago</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm">Blog post published</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">15 min ago</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <AlertTriangle className="h-4 w-4 text-orange-600" />
-                      <span className="text-sm">System alert resolved</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">1 hour ago</span>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Main Dashboard Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Revenue Chart */}
+                <RevenueChart userType="admin" />
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Activity className="h-5 w-5" />
-                    <span>System Health</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Uptime</span>
-                    <Badge variant="default" className="bg-green-600">
-                      {mockSystemHealth.uptime}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Response Time</span>
-                    <Badge variant="secondary">
-                      {mockSystemHealth.responseTime}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Error Rate</span>
-                    <Badge variant="outline" className="text-green-600">
-                      {mockSystemHealth.errorRate}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Last Backup</span>
-                    <span className="text-sm text-muted-foreground">
-                      {mockSystemHealth.lastBackup}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* System Health */}
+                <Card className="shadow-elegant">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Activity className="h-5 w-5 text-primary" />
+                      <span>System Health</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-3 bg-accent/30 rounded-lg">
+                        <p className="text-2xl font-bold text-success">{mockSystemHealth.uptime}</p>
+                        <p className="text-xs text-muted-foreground">Uptime</p>
+                      </div>
+                      <div className="text-center p-3 bg-accent/30 rounded-lg">
+                        <p className="text-2xl font-bold text-info">{mockSystemHealth.responseTime}</p>
+                        <p className="text-xs text-muted-foreground">Response Time</p>
+                      </div>
+                      <div className="text-center p-3 bg-accent/30 rounded-lg">
+                        <p className="text-2xl font-bold text-success">{mockSystemHealth.errorRate}</p>
+                        <p className="text-xs text-muted-foreground">Error Rate</p>
+                      </div>
+                      <div className="text-center p-3 bg-accent/30 rounded-lg">
+                        <p className="text-sm font-bold text-muted-foreground">{mockSystemHealth.lastBackup}</p>
+                        <p className="text-xs text-muted-foreground">Last Backup</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <QuickActions userType="admin" />
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-8">
+                {/* Activity Feed */}
+                <ActivityFeed userType="admin" limit={6} />
+
+                {/* Notification Center */}
+                <NotificationCenter userType="admin" />
+              </div>
             </div>
           </TabsContent>
 
