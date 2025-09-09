@@ -68,9 +68,6 @@ export function Header() {
     { name: "News & Blogs", path: "/blogs", icon: MessageCircle },
   ];
 
-  const toolsItems = [
-    { name: "AI Chatbot", path: "/chatbot", icon: MessageCircle },
-  ];
 
   const adminItems = [
     { name: "Seller Panel", path: "/seller-panel", icon: ShoppingCart },
@@ -173,35 +170,6 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Tools Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium ${
-                      toolsItems.some(item => isActive(item.path))
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    <span>Tools</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-card border border-border">
-                  {toolsItems.map((item) => (
-                    <DropdownMenuItem key={item.path} asChild>
-                      <Link 
-                        to={item.path} 
-                        className={`cursor-pointer ${isActive(item.path) ? 'text-primary' : ''}`}
-                      >
-                        <item.icon className="mr-2 h-4 w-4" />
-                        <span>{item.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
             </nav>
 
             {/* Right Actions */}
@@ -214,11 +182,9 @@ export function Header() {
               {/* Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden md:flex relative">
+                  <Button variant="ghost" size="icon" className="relative">
                     <Bell className="h-4 w-4" />
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full flex items-center justify-center">
-                      <span className="text-xs text-destructive-foreground">3</span>
-                    </div>
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80 bg-card border border-border">
@@ -442,25 +408,6 @@ export function Header() {
                 ))}
               </div>
               
-              {/* Tools items */}
-              <div className="border-t border-border pt-2 mt-2">
-                <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
-                {toolsItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive(item.path)
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`}
-                   >
-                     <item.icon className="h-5 w-5" />
-                     {item.name && <span className="font-medium">{item.name}</span>}
-                   </Link>
-                ))}
-              </div>
             </div>
           </div>
         )}

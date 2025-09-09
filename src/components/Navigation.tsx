@@ -131,9 +131,7 @@ export function Navigation() {
                 </Button>
                 <Button variant="outline" size="icon" className="relative">
                   <Bell className="h-4 w-4" />
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center">
-                    3
-                  </Badge>
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></div>
                 </Button>
                 <ThemeToggle />
               </div>
@@ -262,9 +260,7 @@ export function Navigation() {
             {/* Notifications and Theme for Mobile */}
             <Button variant="outline" size="icon" className="relative">
               <Bell className="h-4 w-4" />
-              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 text-xs p-0 flex items-center justify-center">
-                3
-              </Badge>
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></div>
             </Button>
             <ThemeToggle />
             <SignedOut>
