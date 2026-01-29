@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { FloatingChatbot } from "@/components/FloatingChatbot";
+import ScrollToTop from "@/components/common/ScrollToTop";
 import Index from "./pages/Index";
 import Diagnose from "./pages/Diagnose";
 import Buy from "./pages/Buy";
@@ -34,6 +35,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <LanguageProvider>
           <AuthProvider>
             <Routes>
@@ -68,7 +70,6 @@ const App = () => (
                 <Admin />
               </ProtectedRoute>
             } />
-            <Route path="/crops-hybrid" element={<Layout><div className="p-8 text-center"><h1 className="text-2xl">Crops & Hybrids - Coming Soon</h1></div></Layout>} />
             <Route path="/hybrid" element={<Layout><Hybrid /></Layout>} />
             <Route path="/community" element={<Layout><Community /></Layout>} />
             <Route path="/support" element={<Layout><div className="p-8 text-center"><h1 className="text-2xl">Support & Community - Coming Soon</h1></div></Layout>} />

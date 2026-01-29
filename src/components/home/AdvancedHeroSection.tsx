@@ -30,10 +30,10 @@ export function AdvancedHeroSection() {
   ];
 
   const features = [
-    { icon: Camera, title: "AI Disease Detection", desc: "Instant crop diagnosis" },
-    { icon: TrendingUp, title: "Market Intelligence", desc: "Real-time price insights" },
-    { icon: Shield, title: "Expert Support", desc: "24/7 agricultural guidance" },
-    { icon: Globe, title: "Multi-language", desc: "15+ Indian languages" }
+    { icon: Camera, title: "AI Disease Detection", desc: "Instant crop diagnosis", to: "/diagnose" },
+    { icon: TrendingUp, title: "Market Intelligence", desc: "Real-time price insights", to: "/market-analysis" },
+    { icon: Users, title: "Community", desc: "Connect with farmers", to: "/community" },
+    { icon: Award, title: "News & Blogs", desc: "Latest updates & tips", to: "/blogs" }
   ];
 
   return (
@@ -142,18 +142,21 @@ export function AdvancedHeroSection() {
           <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.8s' }}>
             <div className="grid grid-cols-2 gap-4">
               {features.map((feature, index) => (
-                <Card 
+                <button
                   key={feature.title}
-                  className="bg-primary-foreground/10 backdrop-blur-sm border-primary-foreground/20 hover:bg-primary-foreground/15 transition-all duration-300 shadow-tech hover:shadow-advanced group"
+                  onClick={() => navigate(feature.to)}
+                  className="bg-primary-foreground/10 backdrop-blur-sm border-primary-foreground/20 hover:bg-primary-foreground/15 transition-all duration-300 shadow-tech hover:shadow-advanced group rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-foreground"
+                  style={{ textAlign: 'left' }}
+                  type="button"
                 >
-                  <CardContent className="p-6">
+                  <div className="p-6">
                     <div className="w-12 h-12 mb-4 bg-gradient-secondary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <feature.icon className="h-6 w-6 text-foreground" />
                     </div>
                     <h3 className="font-semibold text-primary-foreground mb-2">{feature.title}</h3>
                     <p className="text-sm text-primary-foreground/70">{feature.desc}</p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </button>
               ))}
             </div>
 

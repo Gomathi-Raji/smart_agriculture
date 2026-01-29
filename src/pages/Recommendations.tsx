@@ -36,6 +36,17 @@ export default function Recommendations() {
   const [openRouterApiKey] = useState(import.meta.env.VITE_OPENROUTER_API_KEY || ''); // OpenRouter API key
   const { weatherData } = useWeather();
   const [showMapSelector, setShowMapSelector] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Advanced optional fields for better accuracy
+  const [farmSize, setFarmSize] = useState('');
+  const [waterSource, setWaterSource] = useState('');
+  const [irrigationType, setIrrigationType] = useState('');
+  const [budget, setBudget] = useState('');
+  const [previousCrop, setPreviousCrop] = useState('');
+  const [farmingExperience, setFarmingExperience] = useState('');
+  const [preferredCropType, setPreferredCropType] = useState('');
+  const [organicPreference, setOrganicPreference] = useState('');
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -174,6 +185,17 @@ export default function Recommendations() {
     const currentMonth = new Date().toLocaleString('default', { month: 'long' });
     const season = getCurrentSeason();
     
+    // Build advanced details section
+    const advancedDetails = [];
+    if (farmSize) advancedDetails.push(`Farm Size: ${farmSize} acres`);
+    if (waterSource) advancedDetails.push(`Water Source: ${waterSource}`);
+    if (irrigationType) advancedDetails.push(`Irrigation Type: ${irrigationType}`);
+    if (budget) advancedDetails.push(`Budget Level: ${budget}`);
+    if (previousCrop) advancedDetails.push(`Previous Crop: ${previousCrop}`);
+    if (farmingExperience) advancedDetails.push(`Farming Experience: ${farmingExperience}`);
+    if (preferredCropType) advancedDetails.push(`Preferred Crop Type: ${preferredCropType}`);
+    if (organicPreference) advancedDetails.push(`Organic Preference: ${organicPreference}`);
+    
     return `You are an agricultural expert AI. Based on the following details, recommend the best crops, vegetables, and fruits for farming in this location right now.
 
 Location: ${loc}
@@ -181,6 +203,9 @@ Current Month: ${currentMonth}
 Season: ${season}
 ${soil ? `Soil Type: ${soil}` : 'Soil Type: Standard regional soil (assumed)'}
 
+${advancedDetails.length > 0 ? `Additional Farm Details:
+${advancedDetails.join('\n')}
+` : ''}
 Weather Data:
 ${weather ? `
 - Temperature: ${weather.current?.temperature_2m}°C
@@ -189,6 +214,8 @@ ${weather ? `
 - Wind Speed: ${weather.current?.wind_speed_10m}km/h
 - Weather Condition: ${weather.current?.weather_code}
 ` : 'Weather data not available - use general regional climate knowledge'}
+
+${advancedDetails.length > 0 ? `Consider the farmer's specific situation: farm size, water availability, budget constraints, previous crops grown, and experience level when making recommendations. Tailor your advice accordingly.` : ''}
 
 Please provide a structured response in this EXACT format:
 
@@ -441,6 +468,153 @@ Make sure to follow this exact structure and format for proper parsing.`;
               </Select>
             </div>
           </div>
+
+          {/* Advanced Options Toggle */}
+          <div className="pt-2">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-primary hover:text-primary/80 p-0 h-auto font-medium"
+            >
+              {showAdvanced ? '▼' : '▶'} Advanced Options (Optional - for better accuracy)
+            </Button>
+          </div>
+
+          {/* Advanced Optional Fields */}
+          {showAdvanced && (
+            <div className="space-y-4 p-4 bg-accent/30 rounded-lg border border-border/50">
+              <p className="text-sm text-muted-foreground">
+                Provide additional details for more personalized recommendations. All fields are optional.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Farm Size */}
+                <div className="space-y-2">
+                  <Label htmlFor="farmSize">Farm Size (acres)</Label>
+                  <Input
+                    id="farmSize"
+                    type="number"
+                    placeholder="e.g., 5"
+                    value={farmSize}
+                    onChange={(e) => setFarmSize(e.target.value)}
+                  />
+                </div>
+
+                {/* Water Source */}
+                <div className="space-y-2">
+                  <Label htmlFor="waterSource">Water Source</Label>
+                  <Select value={waterSource} onValueChange={setWaterSource}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select water source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="well">Well / Borewell</SelectItem>
+                      <SelectItem value="canal">Canal</SelectItem>
+                      <SelectItem value="river">River / Stream</SelectItem>
+                      <SelectItem value="pond">Pond / Tank</SelectItem>
+                      <SelectItem value="rainwater">Rainwater Only</SelectItem>
+                      <SelectItem value="municipal">Municipal Supply</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Irrigation Type */}
+                <div className="space-y-2">
+                  <Label htmlFor="irrigationType">Irrigation Type</Label>
+                  <Select value={irrigationType} onValueChange={setIrrigationType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select irrigation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="drip">Drip Irrigation</SelectItem>
+                      <SelectItem value="sprinkler">Sprinkler</SelectItem>
+                      <SelectItem value="flood">Flood / Furrow</SelectItem>
+                      <SelectItem value="rainfed">Rain-fed Only</SelectItem>
+                      <SelectItem value="manual">Manual Watering</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Budget */}
+                <div className="space-y-2">
+                  <Label htmlFor="budget">Investment Budget</Label>
+                  <Select value={budget} onValueChange={setBudget}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select budget level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low (Under ₹25,000/acre)</SelectItem>
+                      <SelectItem value="medium">Medium (₹25,000 - ₹50,000/acre)</SelectItem>
+                      <SelectItem value="high">High (₹50,000 - ₹1,00,000/acre)</SelectItem>
+                      <SelectItem value="premium">Premium (Above ₹1,00,000/acre)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Previous Crop */}
+                <div className="space-y-2">
+                  <Label htmlFor="previousCrop">Previous Crop Grown</Label>
+                  <Input
+                    id="previousCrop"
+                    placeholder="e.g., Rice, Wheat, Fallow"
+                    value={previousCrop}
+                    onChange={(e) => setPreviousCrop(e.target.value)}
+                  />
+                </div>
+
+                {/* Farming Experience */}
+                <div className="space-y-2">
+                  <Label htmlFor="experience">Farming Experience</Label>
+                  <Select value={farmingExperience} onValueChange={setFarmingExperience}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select experience" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner (0-2 years)</SelectItem>
+                      <SelectItem value="intermediate">Intermediate (3-5 years)</SelectItem>
+                      <SelectItem value="experienced">Experienced (5-10 years)</SelectItem>
+                      <SelectItem value="expert">Expert (10+ years)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Preferred Crop Type */}
+                <div className="space-y-2">
+                  <Label htmlFor="cropType">Preferred Crop Type</Label>
+                  <Select value={preferredCropType} onValueChange={setPreferredCropType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any preference?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="food_grains">Food Grains</SelectItem>
+                      <SelectItem value="cash_crops">Cash Crops</SelectItem>
+                      <SelectItem value="vegetables">Vegetables</SelectItem>
+                      <SelectItem value="fruits">Fruits</SelectItem>
+                      <SelectItem value="mixed">Mixed Farming</SelectItem>
+                      <SelectItem value="export">Export-Oriented</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Organic Preference */}
+                <div className="space-y-2">
+                  <Label htmlFor="organic">Organic Farming</Label>
+                  <Select value={organicPreference} onValueChange={setOrganicPreference}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Organic preference?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fully_organic">Fully Organic</SelectItem>
+                      <SelectItem value="transitioning">Transitioning to Organic</SelectItem>
+                      <SelectItem value="integrated">Integrated (Mix of Both)</SelectItem>
+                      <SelectItem value="conventional">Conventional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Weather Info Display */}
           {weatherData && (

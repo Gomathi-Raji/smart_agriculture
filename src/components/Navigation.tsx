@@ -52,7 +52,6 @@ export function Navigation() {
   const moreItems = [
     { name: "Recommendations", path: "/recommendations", icon: Sparkles },
     { name: "Market Analysis", path: "/market-analysis", icon: TrendingUp },
-    { name: "Crops & Hybrids", path: "/crops-hybrid", icon: Leaf },
     { name: "Government Schemes", path: "/government-schemes", icon: Users },
     { name: "Seller Panel", path: "/seller-panel", icon: ShoppingCart },
     { name: "News & Blogs", path: "/blogs", icon: MessageCircle },

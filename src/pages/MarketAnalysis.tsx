@@ -1,6 +1,15 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -8,63 +17,101 @@ import {
   BarChart3, 
   Calendar,
   MapPin,
-  AlertTriangle
+  AlertTriangle,
+  Search,
+  RefreshCw,
+  Loader2
 } from "lucide-react";
+import { 
+  fetchMarketPrices, 
+  fetchCommodities, 
+  fetchStates,
+  MarketPrice,
+  MarketStats 
+} from "@/services/marketService";
 
 export default function MarketAnalysis() {
-  const priceData = [
-    { 
-      crop: "Tomatoes", 
-      currentPrice: 45, 
-      change: 12.5, 
-      trend: "up", 
-      market: "Pune APMC",
-      forecast: "Stable" 
-    },
-    { 
-      crop: "Wheat", 
-      currentPrice: 2150, 
-      change: -3.2, 
-      trend: "down", 
-      market: "Delhi",
-      forecast: "Declining" 
-    },
-    { 
-      crop: "Rice", 
-      currentPrice: 3200, 
-      change: 8.7, 
-      trend: "up", 
-      market: "Mumbai",
-      forecast: "Rising" 
-    },
-    { 
-      crop: "Onions", 
-      currentPrice: 28, 
-      change: 15.3, 
-      trend: "up", 
-      market: "Nashik",
-      forecast: "Volatile" 
-    },
-  ];
+  const [priceData, setPriceData] = useState<MarketPrice[]>([]);
+  const [stats, setStats] = useState<MarketStats>({
+    totalRecords: 0,
+    marketsRising: 0,
+    marketsFalling: 0,
+    avgPrice: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [commodities, setCommodities] = useState<string[]>([]);
+  const [states, setStates] = useState<string[]>([]);
+  const [selectedCommodity, setSelectedCommodity] = useState<string>("");
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const loadMarketData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { records, stats } = await fetchMarketPrices(
+        selectedCommodity || undefined,
+        selectedState || undefined,
+        50
+      );
+      setPriceData(records);
+      setStats(stats);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch market data");
+      console.error("Market data error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFilters = async () => {
+    try {
+      const [commoditiesList, statesList] = await Promise.all([
+        fetchCommodities(),
+        fetchStates(),
+      ]);
+      setCommodities(commoditiesList);
+      setStates(statesList);
+    } catch (err) {
+      console.error("Error loading filters:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadFilters();
+    loadMarketData();
+  }, []);
+
+  useEffect(() => {
+    loadMarketData();
+  }, [selectedCommodity, selectedState]);
+
+  const filteredData = priceData.filter(
+    (item) =>
+      item.commodity.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.market.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.district.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const insights = [
     {
-      title: "Monsoon Impact Alert",
-      description: "Heavy rainfall expected in North India may affect wheat harvesting. Consider storage options.",
-      type: "warning",
-      icon: AlertTriangle,
-    },
-    {
-      title: "Export Demand Rising",
-      description: "International demand for basmati rice increasing. Good time for premium variety farmers.",
-      type: "success",
-      icon: TrendingUp,
-    },
-    {
-      title: "Festival Season Approach",
-      description: "Vegetable prices likely to surge during upcoming festival season. Plan accordingly.",
+      title: "Live Market Data",
+      description: `Real-time prices from ${stats.totalRecords} market records across India via data.gov.in`,
       type: "info",
-      icon: Calendar,
+      icon: BarChart3,
+    },
+    {
+      title: "Price Trends",
+      description: `${stats.marketsRising} commodities showing upward trend, ${stats.marketsFalling} showing downward movement`,
+      type: stats.marketsRising > stats.marketsFalling ? "success" : "warning",
+      icon: stats.marketsRising > stats.marketsFalling ? TrendingUp : TrendingDown,
+    },
+    {
+      title: "Average Modal Price",
+      description: `Current average modal price across markets: ₹${stats.avgPrice}/quintal`,
+      type: "success",
+      icon: DollarSign,
     },
   ];
 
@@ -76,13 +123,71 @@ export default function MarketAnalysis() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Market Analysis</h1>
-              <p className="text-primary-foreground/90">Real-time prices, trends & AI insights</p>
+              <p className="text-primary-foreground/90">Real-time prices from data.gov.in</p>
             </div>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={loadMarketData}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              <span className="ml-2 hidden sm:inline">Refresh</span>
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-8">
+        {/* Filters */}
+        <Card className="shadow-elegant">
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search commodity, market, district..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Select value={selectedCommodity || "all"} onValueChange={(val) => setSelectedCommodity(val === "all" ? "" : val)}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="All Commodities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Commodities</SelectItem>
+                  {commodities.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedState || "all"} onValueChange={(val) => setSelectedState(val === "all" ? "" : val)}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="All States" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All States</SelectItem>
+                  {states.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Market Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="text-center">
@@ -90,8 +195,8 @@ export default function MarketAnalysis() {
               <div className="w-10 h-10 bg-success/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
-              <p className="text-2xl font-bold text-success">127</p>
-              <p className="text-sm text-muted-foreground">Markets Rising</p>
+              <p className="text-2xl font-bold text-success">{stats.marketsRising}</p>
+              <p className="text-sm text-muted-foreground">Rising Prices</p>
             </CardContent>
           </Card>
 
@@ -100,8 +205,8 @@ export default function MarketAnalysis() {
               <div className="w-10 h-10 bg-destructive/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <TrendingDown className="h-5 w-5 text-destructive" />
               </div>
-              <p className="text-2xl font-bold text-destructive">43</p>
-              <p className="text-sm text-muted-foreground">Markets Falling</p>
+              <p className="text-2xl font-bold text-destructive">{stats.marketsFalling}</p>
+              <p className="text-sm text-muted-foreground">Falling Prices</p>
             </CardContent>
           </Card>
 
@@ -110,8 +215,8 @@ export default function MarketAnalysis() {
               <div className="w-10 h-10 bg-warning/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <DollarSign className="h-5 w-5 text-warning" />
               </div>
-              <p className="text-2xl font-bold text-warning">₹2.1Cr</p>
-              <p className="text-sm text-muted-foreground">Today's Volume</p>
+              <p className="text-2xl font-bold text-warning">₹{stats.avgPrice}</p>
+              <p className="text-sm text-muted-foreground">Avg Price/Quintal</p>
             </CardContent>
           </Card>
 
@@ -120,8 +225,8 @@ export default function MarketAnalysis() {
               <div className="w-10 h-10 bg-info/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <BarChart3 className="h-5 w-5 text-info" />
               </div>
-              <p className="text-2xl font-bold text-info">85%</p>
-              <p className="text-sm text-muted-foreground">AI Accuracy</p>
+              <p className="text-2xl font-bold text-info">{stats.totalRecords}</p>
+              <p className="text-sm text-muted-foreground">Total Records</p>
             </CardContent>
           </Card>
         </div>
@@ -132,72 +237,91 @@ export default function MarketAnalysis() {
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
               Live Market Prices
+              {loading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {priceData.map((item) => (
-                <div
-                  key={item.crop}
-                  className="flex items-center justify-between p-4 bg-accent/50 rounded-lg"
-                >
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{item.crop}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      <span>{item.market}</span>
+            {error ? (
+              <div className="text-center py-8 text-destructive">
+                <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+                <p>{error}</p>
+                <Button onClick={loadMarketData} variant="outline" className="mt-4">
+                  Retry
+                </Button>
+              </div>
+            ) : filteredData.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {loading ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <p>Loading market data...</p>
+                  </div>
+                ) : (
+                  <p>No market data found. Try adjusting your filters.</p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredData.map((item, index) => (
+                  <div
+                    key={`${item.market}-${item.commodity}-${index}`}
+                    className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-accent/50 rounded-lg gap-4"
+                  >
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{item.commodity}</h3>
+                      <p className="text-sm text-muted-foreground">{item.variety}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                        <MapPin className="h-3 w-3" />
+                        <span>{item.market}, {item.district}, {item.state}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground">Min Price</p>
+                        <p className="font-medium">₹{item.minPrice}</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground">Modal Price</p>
+                        <p className="text-lg font-bold text-primary">₹{item.modalPrice}</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground">Max Price</p>
+                        <p className="font-medium">₹{item.maxPrice}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{item.arrivalDate}</span>
+                      </div>
+
+                      <Badge
+                        variant={
+                          item.maxPrice - item.minPrice > item.modalPrice * 0.1
+                            ? "destructive"
+                            : "default"
+                        }
+                      >
+                        {item.maxPrice - item.minPrice > item.modalPrice * 0.1
+                          ? "Volatile"
+                          : "Stable"}
+                      </Badge>
                     </div>
                   </div>
-
-                  <div className="text-center">
-                    <p className="text-lg font-bold">₹{item.currentPrice}</p>
-                    <p className="text-xs text-muted-foreground">per quintal</p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        item.trend === "up"
-                          ? "bg-success/20 text-success"
-                          : "bg-destructive/20 text-destructive"
-                      }`}
-                    >
-                      {item.trend === "up" ? (
-                        <TrendingUp className="h-3 w-3" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3" />
-                      )}
-                      {Math.abs(item.change)}%
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <Badge
-                      variant={
-                        item.forecast === "Rising"
-                          ? "default"
-                          : item.forecast === "Declining"
-                          ? "destructive"
-                          : item.forecast === "Volatile"
-                          ? "outline"
-                          : "secondary"
-                      }
-                    >
-                      {item.forecast}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             <div className="mt-6 flex flex-col sm:flex-row gap-4">
-              <Button variant="default" className="flex-1">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                View Detailed Charts
+              <Button variant="default" className="flex-1" onClick={loadMarketData}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh Data
               </Button>
               <Button variant="outline" className="flex-1">
-                <Calendar className="mr-2 h-4 w-4" />
-                Price History
+                <BarChart3 className="mr-2 h-4 w-4" />
+                View Charts
               </Button>
             </div>
           </CardContent>
@@ -208,7 +332,7 @@ export default function MarketAnalysis() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
-              AI Market Insights
+              Market Insights
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -255,20 +379,9 @@ export default function MarketAnalysis() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-            <AlertTriangle className="h-5 w-5" />
-            <span className="text-sm">Price Alerts</span>
-          </Button>
-          <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-            <BarChart3 className="h-5 w-5" />
-            <span className="text-sm">Export Report</span>
-          </Button>
-          <Button variant="outline" className="h-auto py-4 flex-col gap-2">
-            <Calendar className="h-5 w-5" />
-            <span className="text-sm">Set Reminders</span>
-          </Button>
+        {/* Data Source Attribution */}
+        <div className="text-center text-sm text-muted-foreground">
+          <p>Data sourced from <a href="https://data.gov.in" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">data.gov.in</a> - Government of India Open Data Platform</p>
         </div>
       </div>
     </div>
