@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SearchBar from "./SearchBar";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { SettingsModal } from "@/components/SettingsModal";
@@ -35,6 +36,7 @@ import {
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const location = useLocation();
   const { logout, isAuthenticated, isClerkUser, userRole } = useAuth();
   const { signOut } = useClerk();
@@ -174,9 +176,10 @@ export function Header() {
             {/* Right Actions */}
             <div className="flex items-center space-x-3">
               {/* Search Button */}
-              <Button variant="ghost" size="icon" className="hidden md:flex">
+              <Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => setShowSearch(true)}>
                 <Search className="h-4 w-4" />
               </Button>
+              {showSearch && <SearchBar onClose={() => setShowSearch(false)} />}
               
               {/* Notifications */}
               <DropdownMenu>

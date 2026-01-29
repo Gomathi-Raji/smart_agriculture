@@ -102,9 +102,25 @@ export default function Diagnose() {
               content: [
                 {
                   type: "text",
-                  text: `As an expert agricultural AI, analyze this plant/leaf image in detail. Provide a comprehensive analysis in JSON format with the following structure:
+                  text: `You are an expert agricultural AI that ONLY analyzes images of plants, crops, vegetables, fruits, or seeds. 
+
+FIRST: Carefully examine the image. Does it show a plant, crop, vegetable, fruit, or seed? Look for:
+- Leaves, stems, roots
+- Fruits or vegetables growing on plants
+- Seeds or seedlings
+- Agricultural crops
+
+If the image does NOT contain any plants, crops, vegetables, fruits, or seeds (for example: cars, people, buildings, animals, objects, landscapes without plants), respond ONLY with this exact JSON:
 
 {
+  "isPlantImage": false,
+  "message": "This image does not appear to contain a plant, crop, vegetable, fruit, or seed. Please upload an image of a plant for disease diagnosis."
+}
+
+If the image DOES contain a plant, crop, vegetable, fruit, or seed, respond ONLY with this exact JSON structure:
+
+{
+  "isPlantImage": true,
   "status": "healthy" or "diseased",
   "plantType": "identified plant species if possible",
   "confidence": confidence score (0-100),
@@ -172,11 +188,56 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
       // Clean up the response text (remove markdown formatting if present)
       const cleanedText = analysisText.replace(/```json\n?|\n?```/g, '').trim();
       
+      // Check for non-plant indicators in the raw response
+      const lowerText = cleanedText.toLowerCase();
+      const nonPlantIndicators = [
+        'does not contain', 'does not appear', 'not a plant', 'not contain',
+        'no plant', 'not agricultural', 'not showing', 'not visible',
+        'car', 'person', 'building', 'animal', 'object', 'landscape'
+      ];
+      
+      const isLikelyNotPlant = nonPlantIndicators.some(indicator => 
+        lowerText.includes(indicator)
+      );
+      
+      console.log('AI Response:', cleanedText);
+      console.log('Detected as non-plant:', isLikelyNotPlant);
+      
       try {
         const parsedResult = JSON.parse(cleanedText);
         
-        // Validate required fields and add defaults if missing
+        // Check if the image is not a plant
+        if (parsedResult.isPlantImage === false) {
+          return {
+            isPlantImage: false,
+            message: parsedResult.message || "This image does not appear to contain a plant, crop, vegetable, fruit, or seed. Please upload an image of a plant for disease diagnosis.",
+            status: "not_plant",
+            plantType: null,
+            confidence: 0,
+            disease: null,
+            severity: null,
+            symptoms: [],
+            immediateActions: [],
+            detailedTreatment: {
+              organicSolutions: [],
+              chemicalSolutions: [],
+              stepByStepCure: []
+            },
+            fertilizers: [],
+            nutritionSuggestions: [],
+            preventionTips: [],
+            growthTips: [],
+            seasonalCare: [],
+            companionPlants: [],
+            warningsSigns: [],
+            appreciation: "",
+            additionalAdvice: ""
+          };
+        }
+        
+        // Validate required fields and add defaults if missing for plant images
         return {
+          isPlantImage: true,
           status: parsedResult.status || "unknown",
           plantType: parsedResult.plantType || "Unknown plant",
           confidence: parsedResult.confidence || 85,
@@ -201,7 +262,38 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
         };
       } catch (parseError) {
         console.error('JSON parsing error:', parseError);
-        // Return enhanced fallback data
+        console.error('Raw response:', cleanedText);
+        
+        // If parsing fails and we detected non-plant indicators, treat as non-plant
+        if (isLikelyNotPlant) {
+          return {
+            isPlantImage: false,
+            message: "This image does not appear to contain a plant, crop, vegetable, fruit, or seed. Please upload an image of a plant for disease diagnosis.",
+            status: "not_plant",
+            plantType: null,
+            confidence: 0,
+            disease: null,
+            severity: null,
+            symptoms: [],
+            immediateActions: [],
+            detailedTreatment: {
+              organicSolutions: [],
+              chemicalSolutions: [],
+              stepByStepCure: []
+            },
+            fertilizers: [],
+            nutritionSuggestions: [],
+            preventionTips: [],
+            growthTips: [],
+            seasonalCare: [],
+            companionPlants: [],
+            warningsSigns: [],
+            appreciation: "",
+            additionalAdvice: ""
+          };
+        }
+        
+        // Return enhanced fallback data for parsing errors on plant images
         return {
           status: "diseased",
           plantType: "Unknown plant",
@@ -294,7 +386,7 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
     const result = await analyzeImageWithGemini(selectedImage);
     
     // Add gamification for healthy plants
-    if (result.status === "healthy") {
+    if (result.status === "healthy" && result.isPlantImage !== false) {
       const newBadge = "Healthy Plant Master";
       if (!badges.includes(newBadge)) {
         setBadges([...badges, newBadge]);
@@ -306,7 +398,7 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
   };
 
   const saveDiagnosis = () => {
-    if (analysisResult && selectedImage) {
+    if (analysisResult && selectedImage && analysisResult.isPlantImage !== false) {
       const diagnosis = {
         id: Date.now(),
         image: selectedImage,
@@ -452,7 +544,7 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
                       >
                         <Scan className="mr-2 h-5 w-5" />
                       </motion.div>
-                      Analyzing with AI...
+                      Analyzing image...
                     </>
                   ) : (
                     <>
@@ -478,16 +570,27 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
               <Card className={`shadow-elegant ${
                 analysisResult.status === 'healthy' 
                   ? 'border-success bg-success/5' 
+                  : analysisResult.status === 'not_plant'
+                  ? 'border-warning bg-warning/5'
                   : 'border-destructive bg-destructive/5'
               }`}>
                 <CardHeader>
                   <CardTitle className={`flex items-center gap-2 ${
-                    analysisResult.status === 'healthy' ? 'text-success' : 'text-destructive'
+                    analysisResult.status === 'healthy' 
+                      ? 'text-success' 
+                      : analysisResult.status === 'not_plant'
+                      ? 'text-warning'
+                      : 'text-destructive'
                   }`}>
                     {analysisResult.status === 'healthy' ? (
                       <>
                         <CheckCircle className="h-5 w-5" />
                         Healthy Plant Detected! 🌱
+                      </>
+                    ) : analysisResult.status === 'not_plant' ? (
+                      <>
+                        <AlertCircle className="h-5 w-5" />
+                        Not a Plant Image
                       </>
                     ) : (
                       <>
@@ -496,53 +599,81 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
                       </>
                     )}
                   </CardTitle>
-                  <div className="flex gap-2">
-                    <Button onClick={saveDiagnosis} variant="outline" size="sm">
-                      <Bookmark className="h-4 w-4 mr-1" />
-                      Save
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-1" />
-                      Share
-                    </Button>
-                  </div>
+                  {analysisResult.status !== 'not_plant' && (
+                    <div className="flex gap-2">
+                      <Button onClick={saveDiagnosis} variant="outline" size="sm">
+                        <Bookmark className="h-4 w-4 mr-1" />
+                        Save
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Share2 className="h-4 w-4 mr-1" />
+                        Share
+                      </Button>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Plant Info */}
-                  <div className="bg-accent/20 rounded-lg p-4">
-                    <h4 className="font-semibold text-lg mb-2">{analysisResult.plantType}</h4>
-                    <div className="flex items-center gap-4">
+                  {analysisResult.status === 'not_plant' ? (
+                    // Not a Plant Image Result
+                    <div className="text-center space-y-4">
+                      <motion.div
+                        initial={{ scale: 0.9 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 bg-warning/20 rounded-full flex items-center justify-center mx-auto"
+                      >
+                        <AlertCircle className="h-8 w-8 text-warning" />
+                      </motion.div>
                       <div>
-                        <p className="text-2xl font-bold text-primary">{analysisResult.confidence}%</p>
-                        <p className="text-sm text-muted-foreground">Confidence</p>
+                        <p className="text-lg font-medium text-warning mb-2">Invalid Image Type</p>
+                        <p className="text-muted-foreground">{analysisResult.message}</p>
                       </div>
-                      {analysisResult.status === 'diseased' && (
-                        <>
-                          <div>
-                            <p className="text-lg font-semibold text-destructive">{analysisResult.disease}</p>
-                            <p className="text-sm text-muted-foreground">Disease</p>
-                          </div>
-                          <div>
-                            <p className="text-lg font-semibold text-warning">{analysisResult.severity}</p>
-                            <p className="text-sm text-muted-foreground">Severity</p>
-                          </div>
-                        </>
-                      )}
+                      <Button
+                        onClick={() => {
+                          setSelectedImage(null);
+                          setAnalysisResult(null);
+                        }}
+                        variant="outline"
+                      >
+                        Upload Plant Image
+                      </Button>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      {/* Plant Info */}
+                      <div className="bg-accent/20 rounded-lg p-4">
+                        <h4 className="font-semibold text-lg mb-2">{analysisResult.plantType}</h4>
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-2xl font-bold text-primary">{analysisResult.confidence}%</p>
+                            <p className="text-sm text-muted-foreground">Confidence</p>
+                          </div>
+                          {analysisResult.status === 'diseased' && (
+                            <>
+                              <div>
+                                <p className="text-lg font-semibold text-destructive">{analysisResult.disease}</p>
+                                <p className="text-sm text-muted-foreground">Disease</p>
+                              </div>
+                              <div>
+                                <p className="text-lg font-semibold text-warning">{analysisResult.severity}</p>
+                                <p className="text-sm text-muted-foreground">Severity</p>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
 
-                  {/* Appreciation Message */}
-                  {analysisResult.appreciation && (
-                    <motion.div
-                      initial={{ scale: 0.9 }}
-                      animate={{ scale: 1 }}
-                      className="bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20 rounded-lg p-4"
-                    >
-                      <p className="text-center font-medium text-primary">{analysisResult.appreciation}</p>
-                    </motion.div>
-                  )}
+                      {/* Appreciation Message */}
+                      {analysisResult.appreciation && (
+                        <motion.div
+                          initial={{ scale: 0.9 }}
+                          animate={{ scale: 1 }}
+                          className="bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20 rounded-lg p-4"
+                        >
+                          <p className="text-center font-medium text-primary">{analysisResult.appreciation}</p>
+                        </motion.div>
+                      )}
 
-                  {analysisResult.status === 'healthy' ? (
+                      {analysisResult.status === 'healthy' ? (
                     // Healthy Plant Result
                     <div className="space-y-6">
                       <motion.div
@@ -863,6 +994,8 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
                       ))}
                     </div>
                   </div>
+                  </>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
