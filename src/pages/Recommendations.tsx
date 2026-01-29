@@ -33,7 +33,7 @@ export default function Recommendations() {
   const [soilType, setSoilType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<RecommendationResponse | null>(null);
-  const [openRouterApiKey] = useState(import.meta.env.VITE_OPENROUTER_API_KEY || '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'); // OpenRouter API key
+  const [openRouterApiKey] = useState(import.meta.env.VITE_OPENROUTER_API_KEY || ''); // OpenRouter API key
   const { weatherData } = useWeather();
   const [showMapSelector, setShowMapSelector] = useState(false);
 

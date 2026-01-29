@@ -18,7 +18,7 @@ export default function Diagnose() {
   const [badges, setBadges] = useState<string[]>([]);
   const [savedDiagnoses, setSavedDiagnoses] = useState<any[]>([]);
 
-  const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || "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";
+  const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || "";
 
   const productRecommendations = [
     {

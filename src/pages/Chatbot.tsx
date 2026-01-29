@@ -19,15 +19,10 @@ export default function Chatbot() {
   const [autoPlay, setAutoPlay] = useState(true);
   const controllerRef = useRef<AbortController | null>(null);
   const recognitionRef = useRef<WebkitSpeechRecognition | null>(null);
-  const [openRouterApiKey, setOpenRouterApiKey] = useState<string>("");
+  const openRouterApiKey = import.meta.env.VITE_OPENROUTER_API_KEY || "";
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Load API key from env or localStorage
-    const fromEnv = (import.meta as any)?.env?.VITE_OPENROUTER_API_KEY || "";
-    const fromStorage = typeof window !== "undefined" ? window.localStorage.getItem("OPENROUTER_API_KEY") || "" : "";
-    setOpenRouterApiKey(fromEnv || fromStorage || "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");
-
     // Initialize speech synthesis and load voices
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -347,33 +342,6 @@ export default function Chatbot() {
       <div className="pointer-events-none absolute inset-0 flex items-end justify-center p-4 md:p-8 pt-20">
         <div className="pointer-events-auto w-full max-w-2xl">
           <div className="rounded-2xl border border-border bg-background/80 backdrop-blur-md shadow-xl">
-            {/* API Key setup if missing */}
-            {!openRouterApiKey && (
-              <div className="border-b border-border p-3 flex items-center gap-2 bg-gradient-to-r from-green-50 to-blue-50">
-                <div className="text-2xl">🌱</div>
-                <div className="flex-1">
-                  <input
-                    placeholder="OpenRouter API Key ஐ இங்கே பேஸ்ட் செய்யுங்கள்"
-                    type="password"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-                    onChange={(e) => setOpenRouterApiKey(e.target.value)}
-                  />
-                  <div className="text-xs text-muted-foreground mt-1">என்னை உயிர்ப்பிக்க API key வேண்டும்!</div>
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (openRouterApiKey) {
-                      window.localStorage.setItem("OPENROUTER_API_KEY", openRouterApiKey);
-                    }
-                  }}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  💚 Save
-                </Button>
-              </div>
-            )}
-
             {/* Messages */}
             <div className="max-h-[50vh] overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
