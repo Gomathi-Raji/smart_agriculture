@@ -53,7 +53,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-3 mb-6 group">
               <img 
-                src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                src="/lovable-uploads/agri-logo.png" 
                 alt="AgriSmart Logo" 
                 className="w-12 h-12 object-contain group-hover:scale-105 transition-transform"
               />

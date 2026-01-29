@@ -17,7 +17,7 @@ const NotFound = () => {
         <CardContent className="p-8 text-center">
           {/* Logo */}
           <img 
-            src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+            src="/lovable-uploads/agri-logo.png" 
             alt="AgriSmart Logo" 
             className="w-16 h-16 object-contain mx-auto mb-6"
           />

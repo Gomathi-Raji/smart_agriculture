@@ -69,7 +69,7 @@ export function Navigation() {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                src="/lovable-uploads/agri-logo.png" 
                 alt="AgriSmart Logo" 
                 className="w-10 h-10 object-contain"
               />
@@ -249,7 +249,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-14 px-4">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+              src="/lovable-uploads/agri-logo.png" 
               alt="AgriSmart Logo" 
               className="w-8 h-8 object-contain"
             />

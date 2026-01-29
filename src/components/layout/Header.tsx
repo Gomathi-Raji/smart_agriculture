@@ -83,7 +83,7 @@ export function Header() {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
               <img 
-                src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+                src="/lovable-uploads/agri-logo.png" 
                 alt="AgriSmart Logo" 
                 className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
               />

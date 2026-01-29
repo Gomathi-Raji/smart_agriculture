@@ -72,7 +72,7 @@ export default function RoleLogin() {
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center space-x-2 mb-4">
             <img 
-              src="/lovable-uploads/345f8267-8b61-4c2c-b264-7abf3d231463.png" 
+              src="/lovable-uploads/agri-logo.png" 
               alt="AgriSmart Logo" 
               className="w-12 h-12 object-contain"
             />
