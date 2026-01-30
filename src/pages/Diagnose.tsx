@@ -1075,22 +1075,6 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
                       </>
                     )}
                   </CardTitle>
-                  {analysisResult.status !== 'not_plant' && (
-                    <div className="flex gap-2">
-                      <Button onClick={saveDiagnosis} variant="outline" size="sm">
-                        <Bookmark className="h-4 w-4 mr-1" />
-                        Save
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Share2 className="h-4 w-4 mr-1" />
-                        Share
-                      </Button>
-                      <Button onClick={generatePDFReport} variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-1" />
-                        Download PDF
-                      </Button>
-                    </div>
-                  )}
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {analysisResult.status === 'not_plant' ? (
@@ -1477,6 +1461,22 @@ Be detailed and practical. Focus on actionable advice that farmers can implement
                   </>
                   )}
                 </CardContent>
+                {analysisResult.status !== 'not_plant' && (
+                  <div className="flex gap-2 p-4 border-t">
+                    <Button onClick={saveDiagnosis} variant="outline" size="sm">
+                      <Bookmark className="h-4 w-4 mr-1" />
+                      Save
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Share2 className="h-4 w-4 mr-1" />
+                      Share
+                    </Button>
+                    <Button onClick={generatePDFReport} variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-1" />
+                      Download PDF
+                    </Button>
+                  </div>
+                )}
               </Card>
             </motion.div>
           )}
