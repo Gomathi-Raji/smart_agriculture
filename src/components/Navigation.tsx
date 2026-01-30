@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 
 export function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const location = useLocation();
   // const { t } = useLanguage();
 
@@ -38,10 +38,9 @@ export function Navigation() {
 
   const navItems = [
     { name: "Home", path: "/", icon: Home },
-    { name: "Marketplace", path: "/buy", icon: ShoppingCart },
+    { name: "Market Analysis", path: "/market-analysis", icon: TrendingUp },
     { name: "Community", path: "/community", icon: Users },
-    { name: "Weather", path: "/weather", icon: Cloud }, 
-    { name: "", path: "/user-profile", icon: User }, 
+    { name: "Profile", path: "/user-profile", icon: User },
   ];
 
   const diagnoseItems = [
@@ -159,84 +158,44 @@ export function Navigation() {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-elegant z-50">
-        <div className="relative flex justify-between items-center py-2 px-4">
-          <div className="flex items-center space-x-6">
-            {navItems.slice(0, 3).map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center justify-center p-2 ${
-                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <item.icon className="h-6 w-6" />
-              </Link>
-            ))}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 shadow-elegant z-50 rounded-t-xl" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="relative flex items-center justify-between h-16 px-6">
+          {/* Left icons: Home, Market Analysis */}
+          <div className="flex items-center gap-8">
+            <Link to="/" className={`flex items-center justify-center ${isActive('/') ? 'text-primary bg-slate-800 rounded-full p-2' : 'text-muted-foreground'}`}>
+              <Home className="h-7 w-7" />
+            </Link>
+
+            <Link to="/market-analysis" className={`flex items-center justify-center ${isActive('/market-analysis') ? 'text-primary bg-slate-800 rounded-full p-2' : 'text-muted-foreground'}`}>
+              <TrendingUp className="h-7 w-7" />
+            </Link>
           </div>
 
           {/* Center FAB Diagnose */}
           <Link
             to="/diagnose"
             aria-label="Diagnose"
-            className={`absolute -top-6 left-1/2 transform -translate-x-1/2 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-4 border-white ${
-              isActive("/diagnose") || isActive("/hybrid") ? "ring-2 ring-green-200" : ""
+            className={`absolute -top-7 left-1/2 transform -translate-x-1/2 bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-4 border-slate-900 ${
+              isActive('/diagnose') || isActive('/hybrid') ? 'ring-2 ring-green-200' : ''
             }`}
           >
-            <Camera className="h-6 w-6" />
+            <Camera className="h-8 w-8" />
           </Link>
 
-          <div className="flex items-center space-x-6">
-            {navItems.slice(3, 5).map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center justify-center p-2 ${
-                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <item.icon className="h-6 w-6" />
-              </Link>
-            ))}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center justify-center p-2 text-muted-foreground"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
+          {/* Right icons: Community, Profile */}
+          <div className="flex items-center gap-8">
+            <Link to="/community" className={`flex items-center justify-center ${isActive('/community') ? 'text-primary bg-slate-800 rounded-full p-2' : 'text-muted-foreground'}`}>
+              <Users className="h-7 w-7" />
+            </Link>
+
+            <Link to="/user-profile" className={`flex items-center justify-center ${isActive('/user-profile') ? 'text-primary bg-slate-800 rounded-full p-2' : 'text-muted-foreground'}`}>
+              <User className="h-7 w-7" />
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Mobile More Menu Overlay */}
-      {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40">
-          <div className="fixed bottom-16 left-0 right-0 bg-card border-t border-border rounded-t-2xl p-6">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Add Hybrid Breeding to mobile more menu */}
-              <Link
-                to="/hybrid"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors"
-              >
-                <Leaf className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Hybrid Breeding</span>
-              </Link>
-              {moreItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors"
-                >
-                  <item.icon className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">{item.name}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Mobile Top Bar */}
       <div className="md:hidden bg-card border-b border-border shadow-sm sticky top-0 z-30">
