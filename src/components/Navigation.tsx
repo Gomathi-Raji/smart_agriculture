@@ -160,56 +160,51 @@ export function Navigation() {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-elegant z-50">
-        <div className="flex justify-around items-center py-2">
-          {navItems.slice(0, 3).map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex flex-col items-center space-y-1 p-2 rounded-md min-w-[60px] ${
-                isActive(item.path)
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.name && <span className="text-xs font-medium">{item.name}</span>}
-            </Link>
-          ))}
-          
-          {/* Mobile Diagnose Button */}
+        <div className="relative flex justify-between items-center py-2 px-4">
+          <div className="flex items-center space-x-6">
+            {navItems.slice(0, 3).map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center justify-center p-2 ${
+                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <item.icon className="h-6 w-6" />
+              </Link>
+            ))}
+          </div>
+
+          {/* Center FAB Diagnose */}
           <Link
             to="/diagnose"
-            className={`flex flex-col items-center space-y-1 p-2 rounded-md min-w-[60px] ${
-              isActive("/diagnose") || isActive("/hybrid")
-                ? "text-primary"
-                : "text-muted-foreground"
+            aria-label="Diagnose"
+            className={`absolute -top-6 left-1/2 transform -translate-x-1/2 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-4 border-white ${
+              isActive("/diagnose") || isActive("/hybrid") ? "ring-2 ring-green-200" : ""
             }`}
           >
-            <Camera className="h-5 w-5" />
-            <span className="text-xs font-medium">Diagnose</span>
+            <Camera className="h-6 w-6" />
           </Link>
-          {navItems.slice(3, 5).map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex flex-col items-center space-y-1 p-2 rounded-md min-w-[60px] ${
-                isActive(item.path)
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }`}
+
+          <div className="flex items-center space-x-6">
+            {navItems.slice(3, 5).map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center justify-center p-2 ${
+                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <item.icon className="h-6 w-6" />
+              </Link>
+            ))}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center justify-center p-2 text-muted-foreground"
             >
-              <item.icon className="h-5 w-5" />
-            </Link>
-          ))}
-          
-          {/* More Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex flex-col items-center space-y-1 p-2 rounded-md min-w-[60px] text-muted-foreground"
-          >
-            <Menu className="h-5 w-5" />
-            <span className="text-xs font-medium">More</span>
-          </button>
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </div>
 
